@@ -49,9 +49,15 @@ meet_ladetec/
 ```bash
 git clone https://github.com/rdgx02/meet_ladetec.git
 cd meet_ladetec
+
+2. Crie um ambiente virtual e ative:
 python -m venv .venv
 .venv\Scripts\activate     # Windows
+
+3. Instale as dependências:
 pip install -r requirements.txt
+
+4. Inicie o servidor:
 python app.py
 📍 http://localhost:5000
 
