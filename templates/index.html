@@ -80,7 +80,8 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Digite seu nome completo">
                 </div>
-                
+            
+
                 <!-- Setor -->
                 <div>
                     <label for="sector" class="block text-sm font-medium text-gray-700 mb-1">Setor</label>
@@ -116,17 +117,17 @@
                         <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="203">
                             <i class="fas fa-door-open text-2xl mb-2"></i>
                             <h3 class="font-medium">Sala 203</h3>
-                            <p class="text-sm text-gray-500">Capacidade: 8 pessoas</p>
+                            
                         </div>
                         <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="219">
                             <i class="fas fa-door-open text-2xl mb-2"></i>
                             <h3 class="font-medium">Sala 219</h3>
-                            <p class="text-sm text-gray-500">Capacidade: 12 pessoas</p>
+                   
                         </div>
                         <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="305">
                             <i class="fas fa-door-open text-2xl mb-2"></i>
                             <h3 class="font-medium">Sala 305</h3>
-                            <p class="text-sm text-gray-500">Capacidade: 6 pessoas</p>
+                        
                         </div>
                     </div>
                     <input type="hidden" id="room" name="room" required>
@@ -356,27 +357,41 @@
                     </div>
                 </div>
                 
-                <button id="searchAdmin" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">
-                    <i class="fas fa-search mr-2"></i> Filtrar
-                </button>
+                <div class="flex gap-2">
+  <button id="searchAdmin" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">
+    <i class="fas fa-search mr-2"></i> Filtrar
+  </button>
+  <button id="clearAdminFilters" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">
+    <i class="fas fa-eraser mr-2"></i> Limpar
+  </button>
+</div>
+
             </div>
             
             <div class="overflow-x-auto">
+                <button id="deleteSelectedBtn" class="mb-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+    <i class="fas fa-trash mr-1"></i> Cancelar Selecionados
+</button>
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white rounded-lg overflow-hidden">
                     <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-2 text-left">ID</th>
-                            <th class="px-4 py-2 text-left">Nome</th>
-                            <th class="px-4 py-2 text-left">Setor</th>
-                            <th class="px-4 py-2 text-left">Sala</th>
-                            <th class="px-4 py-2 text-left">Data</th>
-                            <th class="px-4 py-2 text-left">Início</th>
-                            <th class="px-4 py-2 text-left">Fim</th>
-                            <th class="px-4 py-2 text-left">Ticket</th>
-                            <th class="px-4 py-2 text-left">Ações</th>
-                        </tr>
-                    </thead>
+    <tr>
+        <th class="px-4 py-2 text-center">
+            <input type="checkbox" id="selectAllCheckboxes" />
+        </th>
+        <th class="px-4 py-2 text-left">ID</th>
+        <th class="px-4 py-2 text-left">Nome</th>
+        <th class="px-4 py-2 text-left">Setor</th>
+        <th class="px-4 py-2 text-left">Sala</th>
+        <th class="px-4 py-2 text-left">Data</th>
+        <th class="px-4 py-2 text-left">Início</th>
+        <th class="px-4 py-2 text-left">Fim</th>
+        <th class="px-4 py-2 text-left">Ticket</th>
+        <th class="px-4 py-2 text-left">Ações</th>
+    </tr>
+</thead>
+
                     <tbody id="adminResults" class="divide-y divide-gray-200">
                         <!-- Os resultados serão exibidos aqui -->
                     </tbody>
@@ -442,6 +457,11 @@
                 <button id="searchBookings" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
                     <i class="fas fa-search mr-2"></i> Pesquisar
                 </button>
+
+                <button id="clearConsultFilters" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded mt-2">
+    <i class="fas fa-eraser mr-2"></i> Limpar Filtros
+</button>
+
             </div>
             
             <div id="bookingsResults" class="space-y-4">
@@ -449,6 +469,81 @@
             </div>
         </div>
     </div>
+
+<!-- Modal de Confirmação de Cancelamento com Ticket -->
+<div id="confirmCancelModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white p-6 rounded-lg max-w-sm w-full">
+    <h3 class="text-lg font-bold mb-4">Confirmação de Cancelamento</h3>
+    <p class="text-gray-700 mb-2">Digite o <strong>ticket</strong> para confirmar o cancelamento:</p>
+    <input type="text" id="cancelTicketInput" class="w-full px-4 py-2 border rounded-md mb-4" placeholder="Ex: TKT-XXXXX">
+    <div class="flex justify-end space-x-3">
+      <button id="cancelTicketBtn" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</button>
+      <button id="confirmTicketBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Cancelamento em Massa -->
+<div id="adminCancelModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg p-6 max-w-md w-full text-center shadow-lg">
+    <i class="fas fa-check-circle text-red-500 text-5xl mb-3"></i>
+    <h3 class="text-xl font-bold mb-2">Cancelamentos realizados</h3>
+    <p id="adminCancelCount" class="text-gray-700 mb-4"></p>
+    <button id="closeAdminCancelModal" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+      <i class="fas fa-check mr-1"></i> OK
+    </button>
+  </div>
+</div>
+
+<!-- Modal de Confirmação de Cancelamento em Massa -->
+<div id="massCancelConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg p-6 max-w-md w-full text-center shadow-lg">
+    <i class="fas fa-exclamation-circle text-yellow-500 text-5xl mb-3"></i>
+    <h3 class="text-xl font-bold mb-2">Tem certeza?</h3>
+    <p id="massCancelText" class="text-gray-700 mb-4"></p>
+    <div class="flex justify-center space-x-4">
+      <button id="massCancelConfirmBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+        <i class="fas fa-check mr-1"></i> Confirmar
+      </button>
+      <button id="massCancelCancelBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmação Individual -->
+<div id="singleCancelConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg p-6 max-w-md w-full text-center shadow-lg">
+    <i class="fas fa-exclamation-circle text-yellow-500 text-5xl mb-3"></i>
+    <h3 class="text-xl font-bold mb-2">Cancelar agendamento</h3>
+    <p class="text-gray-700 mb-4">Tem certeza que deseja cancelar este agendamento?</p>
+    <div class="flex justify-center space-x-4">
+      <button id="singleCancelConfirmBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+        <i class="fas fa-check mr-1"></i> Confirmar
+      </button>
+      <button id="singleCancelCancelBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Card Final de Cancelamento na Consulta -->
+<div id="consultCancelSuccess" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white p-6 rounded-lg max-w-md w-full text-center shadow-lg">
+    <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+    <h3 class="text-xl font-bold mb-2">Agendamento cancelado com sucesso!</h3>
+    <p id="consultCancelInfo" class="text-gray-700 mb-4"></p>
+    <div class="flex justify-center">
+      <button id="cancelBackToConsult" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+        <i class="fas fa-search mr-1"></i> Consultar Novamente
+      </button>
+    </div>
+  </div>
+</div>
+
+
 
     <script>
     const ADMIN_CREDENTIALS = {
@@ -504,11 +599,17 @@
 
     // INÍCIO: DOM READY
     document.addEventListener('DOMContentLoaded', function () {
-        // Máscara telefone
-        new Cleave('#phone', {
-            phone: true,
-            phoneRegionCode: 'BR'
-        });
+       
+        // Máscara de telefone no formato +55 21 99999-9999
+new Cleave('#phone', {
+    phone: true,
+    phoneRegionCode: 'BR',
+    prefix: '+55 ',
+    noImmediatePrefix: true,
+    rawValueTrimPrefix: true
+});
+
+
 
         // Flatpickr datas
         flatpickr("#date", {
@@ -521,6 +622,10 @@
 
                 // Flatpickr para filtro de data na consulta
         flatpickr("#consultDate", {
+            dateFormat: "d/m/Y",
+            locale: { firstDayOfWeek: 1 }
+        });
+        flatpickr("#adminDate", {
             dateFormat: "d/m/Y",
             locale: { firstDayOfWeek: 1 }
         });
@@ -537,56 +642,66 @@
             });
         });
 
-        // Atualiza horários disponíveis
-        async function updateAvailableTimeSlots() {
-            const room = document.getElementById('room').value;
-            const date = document.getElementById('date').value;
-            const container = document.getElementById('timeSlotsContainer');
-            container.innerHTML = '';
-            if (!room || !date) return;
+       async function updateAvailableTimeSlots() {
+    const room = document.getElementById('room').value;
+    const date = document.getElementById('date').value;
+    const container = document.getElementById('timeSlotsContainer');
+    container.innerHTML = '';
+    if (!room || !date) return;
 
-            for (let hour = 8; hour <= 21; hour++) {
-                const time = `${hour}:00`;
-                const available = await isTimeSlotAvailable(room, date, time, 30);
-                const div = document.createElement('div');
-                div.className = `time-slot cursor-pointer p-2 border rounded-md text-center ${available ? 'border-gray-300' : 'border-gray-200 unavailable'}`;
-                div.textContent = time;
-                div.dataset.time = time;
-                if (available) {
-    div.addEventListener('click', async function () {
-        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected', 'border-blue-500'));
-        this.classList.add('selected', 'border-blue-500');
-        document.getElementById('startTime').value = this.dataset.time;
+    const today = new Date();
+    const [selDay, selMonth, selYear] = date.split('/').map(Number);
+    const selectedDate = new Date(selYear, selMonth - 1, selDay);
+    const isToday = today.toDateString() === selectedDate.toDateString();
 
-        // Verifica quais durações cabem após o horário selecionado
-        const durations = [30, 60, 90, 120];
-        const room = document.getElementById('room').value;
-        const date = document.getElementById('date').value;
-        const startTime = this.dataset.time;
+    for (let hour = 8; hour <= 21; hour++) {
+        const time = `${hour}:00`;
 
-        for (let option of document.querySelectorAll('.duration-option')) {
-            const duration = parseInt(option.dataset.duration);
-            const fits = await isTimeSlotAvailable(room, date, startTime, duration);
-            if (fits) {
-                option.classList.remove('unavailable', 'opacity-50', 'cursor-not-allowed');
-                option.classList.add('cursor-pointer');
-                option.style.pointerEvents = 'auto';
-            } else {
-                option.classList.remove('selected', 'cursor-pointer');
-                option.classList.add('unavailable', 'opacity-50', 'cursor-not-allowed');
-                option.style.pointerEvents = 'none';
-            }
+        // Oculta horários passados se a data for hoje
+        if (isToday) {
+            const nowHour = today.getHours();
+            const nowMin = today.getMinutes();
+            const totalNow = nowHour * 60 + nowMin;
+            const timeMin = hour * 60;
+            if (timeMin <= totalNow) continue;
         }
 
-        // Limpa seleção anterior de duração
-        document.getElementById('duration').value = '';
-        document.querySelectorAll('.duration-option').forEach(opt => opt.classList.remove('selected', 'border-blue-500'));
-    });
+        const available = await isTimeSlotAvailable(room, date, time, 30);
+        const div = document.createElement('div');
+        div.className = `time-slot cursor-pointer p-2 border rounded-md text-center ${available ? 'border-gray-300' : 'border-gray-200 unavailable'}`;
+        div.textContent = time;
+        div.dataset.time = time;
+
+        if (available) {
+            div.addEventListener('click', async function () {
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected', 'border-blue-500'));
+                this.classList.add('selected', 'border-blue-500');
+                document.getElementById('startTime').value = this.dataset.time;
+
+                const durations = [30, 60, 90, 120];
+                for (let option of document.querySelectorAll('.duration-option')) {
+                    const duration = parseInt(option.dataset.duration);
+                    const fits = await isTimeSlotAvailable(room, date, this.dataset.time, duration);
+                    if (fits) {
+                        option.classList.remove('unavailable', 'opacity-50', 'cursor-not-allowed');
+                        option.classList.add('cursor-pointer');
+                        option.style.pointerEvents = 'auto';
+                    } else {
+                        option.classList.remove('selected', 'cursor-pointer');
+                        option.classList.add('unavailable', 'opacity-50', 'cursor-not-allowed');
+                        option.style.pointerEvents = 'none';
+                    }
+                }
+
+                document.getElementById('duration').value = '';
+                document.querySelectorAll('.duration-option').forEach(opt => opt.classList.remove('selected', 'border-blue-500'));
+            });
+        }
+
+        container.appendChild(div);
+    }
 }
 
-                container.appendChild(div);
-            }
-        }
 
         // Duração
         document.querySelectorAll('.duration-option').forEach(opt => {
@@ -755,12 +870,12 @@ document.getElementById('consultButton').addEventListener('click', async () => {
     <p class="flex items-center gap-2 mb-1 text-sm">
       <i class="fa fa-clock text-gray-500"></i> ${b.start_time} - ${calculateEndTime(b.start_time, b.duration)}
     </p>
-    <span class="inline-block bg-gray-100 text-xs font-mono px-2 py-1 rounded mt-2">${b.ticket}</span>
     <span class="absolute top-4 right-4 text-xs px-2 py-1 rounded bg-gray-100">${b.sector}</span>
-    <button class="text-red-600 flex items-center gap-1 mt-3 text-sm cancel-btn" data-id="${b.id}" data-ticket="${b.ticket}">
-      <i class="fa fa-trash"></i> Cancelar
-    </button>
-  `;
+    <button class="cancel-btn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm shadow mt-3" data-id="${b.id}" data-ticket="${b.ticket}">
+  <i class="fas fa-trash-alt"></i>
+  Cancelar
+</button>
+ `;
     container.appendChild(div);
 
     // Ativar o botão cancelar com verificação do ticket
@@ -780,8 +895,12 @@ document.getElementById('consultButton').addEventListener('click', async () => {
             if (input.value.trim() === ticket) {
                 await deleteBooking(id);
                 modal.classList.add('hidden');
-                alert('Agendamento cancelado com sucesso!');
-                document.getElementById('consultButton').click();
+                modal.classList.add('hidden');
+
+const info = `Sala ${b.room} – ${b.start_time} às ${calculateEndTime(b.start_time, b.duration)} – ${b.date}`;
+document.getElementById('consultCancelInfo').textContent = info;
+document.getElementById('consultCancelSuccess').classList.remove('hidden');
+
             } else {
                 alert('Ticket incorreto!');
             }
@@ -826,22 +945,24 @@ document.getElementById('searchBookings').addEventListener('click', async () => 
             return matchDate && matchRoom && matchTime && matchSector && matchSearch;
         })
         .forEach(b => {
-    const div = document.createElement('div');
-    div.className = 'border p-4 rounded shadow-sm bg-white';
-    div.innerHTML = `
-        <p><strong>Nome:</strong> ${b.name}</p>
-        <p><strong>Sala:</strong> ${b.room}</p>
-        <p><strong>Data:</strong> ${b.date}</p>
-        <p><strong>Início:</strong> ${b.start_time}</p>
-        <p><strong>Duração:</strong> ${b.duration} min</p>
-        <p><strong>Setor:</strong> ${b.sector}</p>
-        <p><strong>Ticket:</strong> <span class="ticket-code">${b.ticket}</span></p>
-        <button class="cancel-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 mt-2 rounded" data-id="${b.id}" data-ticket="${b.ticket}">
-            <i class="fas fa-times mr-1"></i> Cancelar
-        </button>
-    `;
-    container.appendChild(div);
+            const div = document.createElement('div');
+            div.className = 'border border-blue-500 rounded-lg shadow-md p-4 mb-4 bg-white relative';
 
+            div.innerHTML = `
+                <div class="absolute top-0 right-0 m-2 px-2 py-1 bg-gray-200 text-xs rounded">${b.sector}</div>
+                <h2 class="text-lg font-semibold mb-1">Sala ${b.room}</h2>
+                <p><i class="fa fa-user mr-1"></i> ${b.name}</p>
+                <p><i class="fa fa-calendar mr-1"></i> ${b.date}</p>
+                <p><i class="fa fa-clock mr-1"></i> ${b.start_time} - ${calculateEndTime(b.start_time, b.duration)}</p>
+                <button class="cancel-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-1" data-id="${b.id}" data-ticket="${b.ticket}">
+                    <i class="fas fa-times mr-1"></i> Cancelar
+                </button>
+            `;
+
+            container.appendChild(div);
+
+
+            
     // Ativar botão cancelar com ticket
     const cancelBtn = div.querySelector('.cancel-btn');
     cancelBtn.addEventListener('click', () => {
@@ -859,8 +980,12 @@ document.getElementById('searchBookings').addEventListener('click', async () => 
             if (input.value.trim() === ticket) {
                 await deleteBooking(id);
                 modal.classList.add('hidden');
-                alert('Agendamento cancelado com sucesso!');
-                document.getElementById('consultButton').click(); // Recarrega
+               modal.classList.add('hidden');
+
+const info = `Sala ${b.room} – ${b.start_time} às ${calculateEndTime(b.start_time, b.duration)} – ${b.date}`;
+document.getElementById('consultCancelInfo').textContent = info;
+document.getElementById('consultCancelSuccess').classList.remove('hidden');
+
             } else {
                 alert('Ticket incorreto!');
             }
@@ -885,7 +1010,6 @@ document.getElementById('cancelAdminLogin').addEventListener('click', () => {
     document.getElementById('adminLoginModal').classList.add('hidden');
 });
 
-// Login admin
 document.getElementById('adminLoginBtn').addEventListener('click', async () => {
     const user = document.getElementById('adminUsername').value;
     const pass = document.getElementById('adminPassword').value;
@@ -901,6 +1025,9 @@ document.getElementById('adminLoginBtn').addEventListener('click', async () => {
         bookings.forEach(b => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td class="px-4 py-2 text-center">
+                    <input type="checkbox" class="rowCheckbox" data-id="${b.id}">
+                </td>
                 <td class="px-4 py-2">${b.id}</td>
                 <td class="px-4 py-2">${b.name}</td>
                 <td class="px-4 py-2">${b.sector}</td>
@@ -910,51 +1037,308 @@ document.getElementById('adminLoginBtn').addEventListener('click', async () => {
                 <td class="px-4 py-2">${calculateEndTime(b.start_time, b.duration)}</td>
                 <td class="px-4 py-2">${b.ticket}</td>
                 <td class="px-4 py-2">
-                    <button class="text-red-500 hover:underline delete-btn" data-id="${b.id}">Cancelar</button>
+                    <button data-id="${b.id}" class="cancelBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm shadow">
+                        <i class="fas fa-trash-alt"></i>
+                        Cancelar
+                    </button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
 
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
-                    await deleteBooking(btn.dataset.id);
+        // Ativar os botões de cancelar com modal personalizado
+        document.querySelectorAll('.cancelBtn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idToDelete = btn.dataset.id;
+                const modal = document.getElementById('singleCancelConfirmModal');
+
+                modal.classList.remove('hidden');
+
+                const confirmBtn = document.getElementById('singleCancelConfirmBtn');
+                const cancelBtn = document.getElementById('singleCancelCancelBtn');
+
+                confirmBtn.onclick = async () => {
+                    await deleteBooking(idToDelete);
                     btn.closest('tr').remove();
-                }
+                    modal.classList.add('hidden');
+                };
+
+                cancelBtn.onclick = () => {
+                    modal.classList.add('hidden');
+                };
             });
         });
+
     } else {
         alert('Usuário ou senha incorretos');
     }
 });
 
+// Ativa ou desativa todos os checkboxes das linhas quando o checkbox principal é clicado
+document.getElementById('selectAllCheckboxes').addEventListener('change', function () {
+    const checkboxes = document.querySelectorAll('.rowCheckbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+// Ação do botão "Cancelar Selecionados"
+document.getElementById('deleteSelectedBtn').addEventListener('click', () => {
+    const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
+
+    if (selectedCheckboxes.length === 0) {
+        alert('Nenhuma reserva selecionada.');
+        return;
+    }
+
+    // Atualiza o texto e mostra o modal de confirmação
+    document.getElementById('massCancelText').textContent = `Tem certeza que deseja cancelar ${selectedCheckboxes.length} reserva(s)?`;
+    document.getElementById('massCancelConfirmModal').classList.remove('hidden');
+
+    // Ao clicar em "Confirmar"
+    document.getElementById('massCancelConfirmBtn').onclick = async () => {
+        for (const checkbox of selectedCheckboxes) {
+            const id = checkbox.dataset.id;
+            await deleteBooking(id);
+            checkbox.closest('tr').remove();
+        }
+
+        // Atualiza texto e mostra modal de sucesso
+        document.getElementById('adminCancelCount').textContent = `${selectedCheckboxes.length} reserva(s) cancelada(s) com sucesso.`;
+        document.getElementById('massCancelConfirmModal').classList.add('hidden');
+        document.getElementById('adminCancelModal').classList.remove('hidden');
+    };
+
+    // Ao clicar em "Cancelar" no modal
+    document.getElementById('massCancelCancelBtn').onclick = () => {
+        document.getElementById('massCancelConfirmModal').classList.add('hidden');
+    };
+});
 
 // Fechar painel admin
 document.getElementById('closeAdmin').addEventListener('click', () => {
     document.getElementById('adminScreen').classList.add('hidden');
 });
-    // Botão "Consultar" no modal de sucesso
+
+
+// Botão "Filtrar" no Admin
+document.getElementById('searchAdmin').addEventListener('click', async () => {
+    const filterDate = document.getElementById('adminDate').value;
+    const filterSearch = document.getElementById('adminSearch').value.toLowerCase();
+    const filterSector = document.getElementById('adminSector').value;
+
+    const bookings = await getAllBookings();
+    const tbody = document.getElementById('adminResults');
+    tbody.innerHTML = '';
+
+    const filtered = bookings.filter(b => {
+        const matchDate = !filterDate || b.date === filterDate;
+        const matchSector = !filterSector || b.sector === filterSector;
+        const matchSearch = !filterSearch || (
+            b.name.toLowerCase().includes(filterSearch) ||
+            b.room.toLowerCase().includes(filterSearch) ||
+            b.start_time.toLowerCase().includes(filterSearch) ||
+            b.ticket.toLowerCase().includes(filterSearch)
+        );
+        return matchDate && matchSector && matchSearch;
+    });
+
+    filtered.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="px-4 py-2 text-center">
+                <input type="checkbox" class="rowCheckbox" data-id="${b.id}">
+            </td>
+            <td class="px-4 py-2">${b.id}</td>
+            <td class="px-4 py-2">${b.name}</td>
+            <td class="px-4 py-2">${b.sector}</td>
+            <td class="px-4 py-2">${b.room}</td>
+            <td class="px-4 py-2">${b.date}</td>
+            <td class="px-4 py-2">${b.start_time}</td>
+            <td class="px-4 py-2">${calculateEndTime(b.start_time, b.duration)}</td>
+            <td class="px-4 py-2">${b.ticket}</td>
+            <td class="px-4 py-2">
+                <button data-id="${b.id}" class="cancelBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm shadow">
+                    <i class="fas fa-trash-alt"></i>
+                    Cancelar
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Reativar botões de cancelar
+    document.querySelectorAll('.cancelBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idToDelete = btn.dataset.id;
+            const modal = document.getElementById('singleCancelConfirmModal');
+
+            modal.classList.remove('hidden');
+
+            const confirmBtn = document.getElementById('singleCancelConfirmBtn');
+            const cancelBtn = document.getElementById('singleCancelCancelBtn');
+
+            confirmBtn.onclick = async () => {
+                await deleteBooking(idToDelete);
+                btn.closest('tr').remove();
+                modal.classList.add('hidden');
+            };
+
+            cancelBtn.onclick = () => {
+                modal.classList.add('hidden');
+            };
+        });
+    });
+});
+
+
+// Botão "Limpar Filtros" no Admin
+document.getElementById('clearAdminFilters').addEventListener('click', async () => {
+    document.getElementById('adminDate').value = '';
+    document.getElementById('adminSearch').value = '';
+    document.getElementById('adminSector').value = '';
+
+    document.getElementById('searchAdmin').click(); // Reaplica o filtro limpo
+});
+
+
+    // Reativa os botões de cancelamento
+    document.querySelectorAll('.cancelBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idToDelete = btn.dataset.id;
+            const modal = document.getElementById('singleCancelConfirmModal');
+
+            modal.classList.remove('hidden');
+
+            const confirmBtn = document.getElementById('singleCancelConfirmBtn');
+            const cancelBtn = document.getElementById('singleCancelCancelBtn');
+
+            confirmBtn.onclick = async () => {
+                await deleteBooking(idToDelete);
+                btn.closest('tr').remove();
+                modal.classList.add('hidden');
+            };
+
+            cancelBtn.onclick = () => {
+                modal.classList.add('hidden');
+            };
+        });
+    });
+
+
+
+// Botão "Consultar" no modal de sucesso
 document.getElementById('goToConsult').addEventListener('click', async () => {
     document.getElementById('confirmationModal').classList.add('hidden');
     document.getElementById('consultButton').click();
 });
 
-        // TODO: completar lógica de consulta e admin (depois)
+// Botão "OK" no modal de cancelamento em massa
+document.getElementById('closeAdminCancelModal').addEventListener('click', () => {
+    document.getElementById('adminCancelModal').classList.add('hidden');
+});
+    
+// Botão "Filtrar" no Admin
+document.getElementById('searchAdmin').addEventListener('click', async () => {
+    const filterDate = document.getElementById('adminDate').value;
+    const filterSearch = document.getElementById('adminSearch').value.toLowerCase();
+    const filterSector = document.getElementById('adminSector').value;
 
-</script>
-<!-- Modal de Confirmação de Cancelamento com Ticket -->
-<div id="confirmCancelModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-  <div class="bg-white p-6 rounded-lg max-w-sm w-full">
-    <h3 class="text-lg font-bold mb-4">Confirmação de Cancelamento</h3>
-    <p class="text-gray-700 mb-2">Digite o <strong>ticket</strong> para confirmar o cancelamento:</p>
-    <input type="text" id="cancelTicketInput" class="w-full px-4 py-2 border rounded-md mb-4" placeholder="Ex: TKT-XXXXX">
-    <div class="flex justify-end space-x-3">
-      <button id="cancelTicketBtn" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</button>
-      <button id="confirmTicketBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Confirmar</button>
-    </div>
-  </div>
-</div>
+    const bookings = await getAllBookings();
+    const tbody = document.getElementById('adminResults');
+    tbody.innerHTML = '';
+
+    const filtered = bookings.filter(b => {
+        const matchDate = !filterDate || b.date === filterDate;
+        const matchSector = !filterSector || b.sector === filterSector;
+        const matchSearch = !filterSearch || (
+            b.name.toLowerCase().includes(filterSearch) ||
+            b.room.toLowerCase().includes(filterSearch) ||
+            b.start_time.toLowerCase().includes(filterSearch) ||
+            b.ticket.toLowerCase().includes(filterSearch)
+        );
+        return matchDate && matchSector && matchSearch;
+    });
+
+    filtered.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="px-4 py-2 text-center">
+                <input type="checkbox" class="rowCheckbox" data-id="${b.id}">
+            </td>
+            <td class="px-4 py-2">${b.id}</td>
+            <td class="px-4 py-2">${b.name}</td>
+            <td class="px-4 py-2">${b.sector}</td>
+            <td class="px-4 py-2">${b.room}</td>
+            <td class="px-4 py-2">${b.date}</td>
+            <td class="px-4 py-2">${b.start_time}</td>
+            <td class="px-4 py-2">${calculateEndTime(b.start_time, b.duration)}</td>
+            <td class="px-4 py-2">${b.ticket}</td>
+            <td class="px-4 py-2">
+                <button data-id="${b.id}" class="cancelBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm shadow">
+                    <i class="fas fa-trash-alt"></i>
+                    Cancelar
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Reativar botões de cancelamento
+    document.querySelectorAll('.cancelBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idToDelete = btn.dataset.id;
+            const modal = document.getElementById('singleCancelConfirmModal');
+
+            modal.classList.remove('hidden');
+
+            const confirmBtn = document.getElementById('singleCancelConfirmBtn');
+            const cancelBtn = document.getElementById('singleCancelCancelBtn');
+
+            confirmBtn.onclick = async () => {
+                await deleteBooking(idToDelete);
+                btn.closest('tr').remove();
+                modal.classList.add('hidden');
+            };
+
+            cancelBtn.onclick = () => {
+                modal.classList.add('hidden');
+            };
+        });
+    });
+});
+
+// Botão "Limpar Filtros"
+document.getElementById('clearAdminFilters').addEventListener('click', () => {
+    document.getElementById('adminDate').value = '';
+    document.getElementById('adminSearch').value = '';
+    document.getElementById('adminSector').value = '';
+    document.getElementById('searchAdmin').click();
+});
+
+
+// Botão do card final: "Consultar Novamente"
+document.getElementById('cancelBackToConsult').addEventListener('click', () => {
+  document.getElementById('consultCancelSuccess').classList.add('hidden');
+  document.getElementById('consultButton').click();
+});
+
+
+
+    // FIM: DOM READY
+
+    
+// Botão "Limpar Filtros" da tela de consulta pública
+document.getElementById('clearConsultFilters').addEventListener('click', () => {
+    document.getElementById('consultDate').value = '';
+    document.getElementById('consultSearch').value = '';
+    document.getElementById('consultRoom').value = '';
+    document.getElementById('consultTime').value = '';
+    document.getElementById('consultSector').value = '';
+
+    // Dispara a busca novamente com todos os filtros limpos
+    document.getElementById('searchBookings').click();
+});
+
+    </script>
 
 </body>
 </html>

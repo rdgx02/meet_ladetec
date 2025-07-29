@@ -84,7 +84,7 @@ def create_booking():
 
     booking_id = insert_booking(data)
 
-        # Calcula horário final com base em start_time e duration
+    # Calcula horário final com base em start_time e duration
     def calcular_fim(start_time, duration):
         hora, minuto = map(int, start_time.split(':'))
         total_minutos = hora * 60 + minuto + duration
@@ -105,7 +105,6 @@ def create_booking():
         'ticket': ticket
     })
 
-
     return jsonify({
         **data,
         'id': booking_id,
@@ -118,5 +117,6 @@ def remove_booking(booking_id):
     delete_booking(booking_id)
     return '', 204
 
+# ✅ Rodar na rede para acesso via celular (Wi-Fi)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
