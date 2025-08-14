@@ -13,8 +13,8 @@ CORS(app)
 init_db()
 
 # URL do webhook do n8n
-N8N_WEBHOOK_URL = "https://n8n.ladetec.iq.ufrj.br/webhook/confirmar-agendamento"
-API_KEY = "326E97B23199-47C5-9AB4-69B2B9B9C71A"
+N8N_WEBHOOK_URL = "https://n8n.ladetec.iq.ufrj.br/webhook/meet-cati"
+API_KEY = "F25F310E71F6-4DAC-9615-16C76098B303"
 
 def enviar_para_n8n(dados):
     try:
