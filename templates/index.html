@@ -211,12 +211,17 @@
                     </button>
                 </div>
 
-                <!-- Botão de Admin -->
-                <div class="pt-2">
-                    <button type="button" id="adminButton" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-md transition duration-300">
-                        <i class="fas fa-user-shield mr-2"></i> Painel Admin
-                    </button>
-                </div>
+                <!-- Botão de Admin (corrigido) -->
+<div class="pt-2">
+  <button
+    type="button"
+    id="adminButton"
+    onclick="document.getElementById('adminLoginModal').classList.remove('hidden')"
+    class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-md transition duration-300"
+  >
+    <i class="fas fa-user-shield mr-2"></i> Painel Admin
+  </button>
+</div>
             </form>
         </div>
     </div>
@@ -248,92 +253,122 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmação -->
-    <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg p-6 max-w-md w-full">
-            <div class="text-center mb-4">
-                <i class="fas fa-check-circle text-green-500 text-5xl mb-3"></i>
-                <h3 class="text-xl font-bold">Agendamento realizado com sucesso!</h3>
-            </div>
-            
-            <div class="space-y-3 mb-6">
-                <div class="flex justify-between border-b pb-2">
-                    <span class="font-medium">Nome:</span>
-                    <span id="confirmationName"></span>
-                </div>
-                <div class="flex justify-between border-b pb-2">
-    <span class="font-medium">Sala:</span>
-    <span id="confirmationRoom"></span>
-</div>
-<div class="flex justify-between border-b pb-2">
-    <span class="font-medium">Repetição:</span>
-    <span id="confirmationRepeat"></span>
+   <!-- Modal de Confirmação (público) -->
+<div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg p-6 max-w-md w-full">
+    <div class="text-center mb-4">
+      <i class="fas fa-check-circle text-green-500 text-5xl mb-3"></i>
+      <h3 class="text-xl font-bold">Agendamento realizado com sucesso!</h3>
+    </div>
+    
+    <div class="space-y-3 mb-6">
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Nome:</span>
+        <span id="confirmationName"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Sala:</span>
+        <span id="confirmationRoom"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Repetição:</span>
+        <span id="confirmationRepeat"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Data:</span>
+        <span id="confirmationDate"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Horário:</span>
+        <span id="confirmationTime"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Duração:</span>
+        <span id="confirmationDuration"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Ticket:</span>
+        <span id="confirmationTicket" class="font-bold"></span>
+      </div>
+    </div>
+    
+    <div class="flex space-x-3">
+      <button id="backToBooking" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+        <i class="fas fa-arrow-left mr-2"></i> Novo Agendamento
+      </button>
+      <button id="goToConsult" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">
+        <i class="fas fa-search mr-2"></i> Consultar
+      </button>
+    </div>
+  </div>
 </div>
 
-
-                <div class="flex justify-between border-b pb-2">
-                    <span class="font-medium">Data:</span>
-                    <span id="confirmationDate"></span>
-                </div>
-                <div class="flex justify-between border-b pb-2">
-                    <span class="font-medium">Horário:</span>
-                    <span id="confirmationTime"></span>
-                </div>
-                <div class="flex justify-between border-b pb-2">
-                    <span class="font-medium">Duração:</span>
-                    <span id="confirmationDuration"></span>
-                </div>
-                <div class="flex justify-between border-b pb-2">
-                    <span class="font-medium">Ticket:</span>
-                    <span id="confirmationTicket" class="font-bold"></span>
-                </div>
-            </div>
-            
-            <div class="flex space-x-3">
-                <button id="backToBooking" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
-                    <i class="fas fa-arrow-left mr-2"></i> Novo Agendamento
-                </button>
-                <button id="goToConsult" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">
-                    <i class="fas fa-search mr-2"></i> Consultar
-                </button>
-            </div>
-        </div>
+<!-- Modal de Confirmação (Admin) -->
+<div id="confirmationModalAdmin" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg p-6 max-w-md w-full">
+    <div class="text-center mb-4">
+      <i class="fas fa-check-circle text-green-500 text-5xl mb-3"></i>
+      <h3 class="text-xl font-bold">Agendamento realizado com sucesso (Admin)!</h3>
     </div>
 
-    <!-- Modal de Login Admin -->
-    <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold mb-4 text-center">Acesso Administrativo</h3>
-            <div class="space-y-4">
-                <div>
-                    <label for="adminUsername" class="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
-                    <input type="text" id="adminUsername" class="w-full px-4 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                    <input type="password" id="adminPassword" class="w-full px-4 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div class="flex space-x-3 pt-2">
-                    <button id="adminLoginBtn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">
-                        Entrar
-                    </button>
-                    <button id="cancelAdminLogin" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
+    <div class="space-y-3 mb-6">
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Nome:</span>
+        <span id="confirmationNameAdmin"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Sala:</span>
+        <span id="confirmationRoomAdmin"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Repetição:</span>
+        <span id="confirmationRepeatAdmin"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Data:</span>
+        <span id="confirmationDateAdmin"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Horário:</span>
+        <span id="confirmationTimeAdmin"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Duração:</span>
+        <span id="confirmationDurationAdmin"></span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span class="font-medium">Ticket(s):</span>
+        <span id="confirmationTicketAdmin" class="font-bold"></span>
+      </div>
     </div>
+
+    <div class="flex space-x-3">
+      <button id="backToBookingAdmin" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">
+        <i class="fas fa-arrow-left mr-2"></i> Novo Agendamento
+      </button>
+      <button id="goToConsultAdmin" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+        <i class="fas fa-search mr-2"></i> Consultar
+      </button>
+    </div>
+  </div>
+</div>
+
 
     <!-- Tela de Admin -->
     <div id="adminScreen" class="fixed inset-0 bg-white p-6 hidden overflow-y-auto">
         <div class="container mx-auto px-4 max-w-6xl">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Painel de Administração</h2>
-                <button id="closeAdmin" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
+    <h2 class="text-2xl font-bold">Painel de Administração</h2>
+    <div class="flex items-center gap-4">
+        <button id="adminLogoutBtn" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded">
+            <i class="fas fa-sign-out-alt mr-1"></i> Sair
+        </button>
+        <button id="closeAdmin" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times text-2xl"></i>
+        </button>
+    </div>
+    </div>
+
             
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -364,7 +399,14 @@
   <button id="clearAdminFilters" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">
     <i class="fas fa-eraser mr-2"></i> Limpar
   </button>
-</div>
+  <button id="viewLogsBtn" class="flex-1 bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded">
+  <i class="fas fa-list-alt mr-1"></i> Ver Logs
+</button>
+        <button id="openAdminBookingBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
+        <i class="fas fa-calendar-plus mr-2"></i> Novo Agendamento (Admin)
+        </button>
+
+                </div>
 
             </div>
             
@@ -546,10 +588,7 @@
 
 
     <script>
-    const ADMIN_CREDENTIALS = {
-        username: 'admin',
-        password: '4dm@L4d3t3c2025'
-    };
+
 
     // Função util para calcular fim
     function calculateEndTime(startTime, duration) {
@@ -712,36 +751,27 @@ new Cleave('#phone', {
             });
         });
 
-        // Repetição
+        // Repetição (público)
 const repeatOptions = document.querySelectorAll('.repeat-option');
 const repeatTimesContainer = document.getElementById('repeatTimesContainer');
 
 repeatOptions.forEach(opt => {
-    opt.addEventListener('click', function () {
-        function updateRepeatTimesLabel(type) {
-            const select = document.getElementById('repeatTimes');
-            const label = type === 'weekly' ? ' semanas' : ' meses';
+  opt.addEventListener('click', function () {
+    function updateRepeatTimesLabel(type) {
+      const select = document.getElementById('repeatTimes');
+      const label = type === 'weekly' ? ' semanas' : ' meses';
+      [...select.options].forEach(o => { o.textContent = o.value + label; });
+    }
 
-            [...select.options].forEach(opt => {
-                opt.textContent = opt.value + label;
-            });
-        }
+    updateRepeatTimesLabel(this.dataset.repeat);
 
-        updateRepeatTimesLabel(this.dataset.repeat); // aplica rótulos ao selecionar
-
-        repeatOptions.forEach(o => o.classList.remove('selected', 'border-blue-500'));
-        this.classList.add('selected', 'border-blue-500');
-        document.getElementById('repeat').value = this.dataset.repeat;
-        repeatTimesContainer.classList.toggle('hidden', this.dataset.repeat === 'none');
-    });
+    repeatOptions.forEach(o => o.classList.remove('selected', 'border-blue-500'));
+    this.classList.add('selected', 'border-blue-500');
+    document.getElementById('repeat').value = this.dataset.repeat;
+    repeatTimesContainer.classList.toggle('hidden', this.dataset.repeat === 'none');
+  });
 });
 
-                repeatOptions.forEach(o => o.classList.remove('selected', 'border-blue-500'));
-                this.classList.add('selected', 'border-blue-500');
-                document.getElementById('repeat').value = this.dataset.repeat;
-                
-                repeatTimesContainer.classList.toggle('hidden', this.dataset.repeat === 'none');
-            });
 
         // Submissão do formulário
         document.getElementById('bookingForm').addEventListener('submit', async function (e) {
@@ -1011,68 +1041,64 @@ document.getElementById('cancelAdminLogin').addEventListener('click', () => {
 });
 
 document.getElementById('adminLoginBtn').addEventListener('click', async () => {
-    const user = document.getElementById('adminUsername').value;
-    const pass = document.getElementById('adminPassword').value;
+    const username = document.getElementById('adminUsername').value.trim();
+    const password = document.getElementById('adminPassword').value.trim();
 
-    if (user === ADMIN_CREDENTIALS.username && pass === ADMIN_CREDENTIALS.password) {
-        document.getElementById('adminLoginModal').classList.add('hidden');
-        document.getElementById('adminScreen').classList.remove('hidden');
+    if (!username || !password) {
+        alert('Preencha todos os campos.');
+        return;
+    }
 
-        const bookings = await getAllBookings();
-        const tbody = document.getElementById('adminResults');
-        tbody.innerHTML = '';
-
-        bookings.forEach(b => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="px-4 py-2 text-center">
-                    <input type="checkbox" class="rowCheckbox" data-id="${b.id}">
-                </td>
-                <td class="px-4 py-2">${b.id}</td>
-                <td class="px-4 py-2">${b.name}</td>
-                <td class="px-4 py-2">${b.sector}</td>
-                <td class="px-4 py-2">${b.room}</td>
-                <td class="px-4 py-2">${b.date}</td>
-                <td class="px-4 py-2">${b.start_time}</td>
-                <td class="px-4 py-2">${calculateEndTime(b.start_time, b.duration)}</td>
-                <td class="px-4 py-2">${b.ticket}</td>
-                <td class="px-4 py-2">
-                    <button data-id="${b.id}" class="cancelBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm shadow">
-                        <i class="fas fa-trash-alt"></i>
-                        Cancelar
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
+    try {
+        const response = await fetch('/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
         });
 
-        // Ativar os botões de cancelar com modal personalizado
-        document.querySelectorAll('.cancelBtn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const idToDelete = btn.dataset.id;
-                const modal = document.getElementById('singleCancelConfirmModal');
+        const result = await response.json();
 
-                modal.classList.remove('hidden');
+        if (result.ok) {
+            alert(`Bem-vindo, ${result.name}!`);
+            document.getElementById('adminLoginModal').classList.add('hidden');
+            document.getElementById('adminScreen').classList.remove('hidden');
 
-                const confirmBtn = document.getElementById('singleCancelConfirmBtn');
-                const cancelBtn = document.getElementById('singleCancelCancelBtn');
+            const bookings = await getAllBookings();
+            const tbody = document.getElementById('adminResults');
+            tbody.innerHTML = '';
 
-                confirmBtn.onclick = async () => {
-                    await deleteBooking(idToDelete);
-                    btn.closest('tr').remove();
-                    modal.classList.add('hidden');
-                };
-
-                cancelBtn.onclick = () => {
-                    modal.classList.add('hidden');
-                };
+            bookings.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-4 py-2 text-center">
+                        <input type="checkbox" class="rowCheckbox" data-id="${b.id}">
+                    </td>
+                    <td class="px-4 py-2">${b.id}</td>
+                    <td class="px-4 py-2">${b.name}</td>
+                    <td class="px-4 py-2">${b.sector}</td>
+                    <td class="px-4 py-2">${b.room}</td>
+                    <td class="px-4 py-2">${b.date}</td>
+                    <td class="px-4 py-2">${b.start_time}</td>
+                    <td class="px-4 py-2">${calculateEndTime(b.start_time, b.duration)}</td>
+                    <td class="px-4 py-2">${b.ticket}</td>
+                    <td class="px-4 py-2">
+                        <button data-id="${b.id}" class="cancelBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm shadow">
+                            <i class="fas fa-trash-alt"></i>
+                            Cancelar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
-        });
 
-    } else {
-        alert('Usuário ou senha incorretos');
+        } else {
+            alert(result.message || 'Usuário ou senha inválidos.');
+        }
+    } catch (err) {
+        alert('Erro na requisição: ' + err);
     }
 });
+
 
 // Ativa ou desativa todos os checkboxes das linhas quando o checkbox principal é clicado
 document.getElementById('selectAllCheckboxes').addEventListener('change', function () {
@@ -1165,28 +1191,6 @@ document.getElementById('searchAdmin').addEventListener('click', async () => {
         tbody.appendChild(tr);
     });
 
-    // Reativar botões de cancelar
-    document.querySelectorAll('.cancelBtn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const idToDelete = btn.dataset.id;
-            const modal = document.getElementById('singleCancelConfirmModal');
-
-            modal.classList.remove('hidden');
-
-            const confirmBtn = document.getElementById('singleCancelConfirmBtn');
-            const cancelBtn = document.getElementById('singleCancelCancelBtn');
-
-            confirmBtn.onclick = async () => {
-                await deleteBooking(idToDelete);
-                btn.closest('tr').remove();
-                modal.classList.add('hidden');
-            };
-
-            cancelBtn.onclick = () => {
-                modal.classList.add('hidden');
-            };
-        });
-    });
 });
 
 
@@ -1198,31 +1202,6 @@ document.getElementById('clearAdminFilters').addEventListener('click', async () 
 
     document.getElementById('searchAdmin').click(); // Reaplica o filtro limpo
 });
-
-
-    // Reativa os botões de cancelamento
-    document.querySelectorAll('.cancelBtn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const idToDelete = btn.dataset.id;
-            const modal = document.getElementById('singleCancelConfirmModal');
-
-            modal.classList.remove('hidden');
-
-            const confirmBtn = document.getElementById('singleCancelConfirmBtn');
-            const cancelBtn = document.getElementById('singleCancelCancelBtn');
-
-            confirmBtn.onclick = async () => {
-                await deleteBooking(idToDelete);
-                btn.closest('tr').remove();
-                modal.classList.add('hidden');
-            };
-
-            cancelBtn.onclick = () => {
-                modal.classList.add('hidden');
-            };
-        });
-    });
-
 
 
 // Botão "Consultar" no modal de sucesso
@@ -1280,31 +1259,35 @@ document.getElementById('searchAdmin').addEventListener('click', async () => {
             </td>
         `;
         tbody.appendChild(tr);
-    });
-
-    // Reativar botões de cancelamento
-    document.querySelectorAll('.cancelBtn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const idToDelete = btn.dataset.id;
-            const modal = document.getElementById('singleCancelConfirmModal');
-
-            modal.classList.remove('hidden');
-
-            const confirmBtn = document.getElementById('singleCancelConfirmBtn');
-            const cancelBtn = document.getElementById('singleCancelCancelBtn');
-
-            confirmBtn.onclick = async () => {
-                await deleteBooking(idToDelete);
-                btn.closest('tr').remove();
-                modal.classList.add('hidden');
-            };
-
-            cancelBtn.onclick = () => {
-                modal.classList.add('hidden');
-            };
-        });
-    });
+    })
 });
+
+// Ativar botões de cancelar com delegation (funciona sempre)
+document.getElementById('adminResults').addEventListener('click', (e) => {
+    const btn = e.target.closest('.cancelBtn');
+    if (!btn) return; // Se não clicou em botão de cancelar, sai
+
+    const idToDelete = btn.dataset.id;
+    const modal = document.getElementById('singleCancelConfirmModal');
+
+    modal.classList.remove('hidden');
+
+    const confirmBtn = document.getElementById('singleCancelConfirmBtn');
+    const cancelBtn = document.getElementById('singleCancelCancelBtn');
+
+    confirmBtn.onclick = async () => {
+        await deleteBooking(idToDelete);
+        btn.closest('tr').remove();
+        modal.classList.add('hidden');
+    };
+
+    cancelBtn.onclick = () => {
+        modal.classList.add('hidden');
+    };
+});
+
+
+
 
 // Botão "Limpar Filtros"
 document.getElementById('clearAdminFilters').addEventListener('click', () => {
@@ -1321,6 +1304,27 @@ document.getElementById('cancelBackToConsult').addEventListener('click', () => {
   document.getElementById('consultButton').click();
 });
 
+// Abrir/fechar
+document.getElementById('openAdminBookingBtn').addEventListener('click', () => {
+  document.getElementById('adminBookingScreen').classList.remove('hidden');
+  if (!document.getElementById('adminBookingScreen').dataset.ready) {
+    setupAdminBooking();
+    document.getElementById('adminBookingScreen').dataset.ready = '1';
+  }
+});
+
+// Fecha a tela de agendamento (Admin) – delegado garante que sempre funciona
+document.addEventListener('click', (e) => {
+  const btn = e.target.id === 'closeAdminBookingScreen'
+           ? e.target
+           : e.target.closest && e.target.closest('#closeAdminBookingScreen');
+
+  if (btn) {
+    const modal = document.getElementById('adminBookingScreen');
+    if (modal) modal.classList.add('hidden');
+  }
+});
+});
 
 
     // FIM: DOM READY
@@ -1338,7 +1342,593 @@ document.getElementById('clearConsultFilters').addEventListener('click', () => {
     document.getElementById('searchBookings').click();
 });
 
+// Abre o modal de logs e carrega os dados
+document.getElementById("viewLogsBtn").addEventListener("click", async () => {
+  try {
+    const res = await fetch("/api/logs");
+    const logs = await res.json();
+
+    const container = document.getElementById("logsContainer");
+    container.innerHTML = "";
+
+    if (logs.length === 0) {
+      container.innerHTML = "<p class='text-gray-600'>Nenhum log encontrado.</p>";
+    } else {
+      logs.forEach(log => {
+        const el = document.createElement("div");
+        el.className = "border border-gray-300 p-2 rounded bg-gray-50";
+
+        el.innerHTML = `
+            <div><strong>Ação:</strong> ${log.action || '-'}</div>
+            <div><strong>Usuário:</strong> ${log.user_name || '-'}</div>
+            <div><strong>Entidade:</strong> ${log.entity || '-'}</div>
+            <div><strong>Detalhes:</strong></div>
+            <div class="text-sm text-gray-700 whitespace-pre-line">
+                ${(() => {
+                    try {
+                        const d = JSON.parse(log.details);   // tenta converter em objeto
+                        let formatted = Object.entries(d).map(([k, v]) => `${k}: ${v}`).join("\n");
+if (log.entity_id) {
+    formatted = `id: ${log.entity_id}\n` + formatted;
+}
+return formatted;
+
+                    } catch {
+                        return log.details || "-";  // se não for JSON, mostra cru
+                    }
+                })()}
+            </div>
+
+            <div><strong>IP:</strong> ${log.ip || '-'}</div>
+            <div><strong>Data:</strong> ${log.timestamp || '-'}</div>
+
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    document.getElementById("logsModal").classList.remove("hidden");
+  } catch (err) {
+    alert("Erro ao carregar logs.");
+    console.error(err);
+  }
+});
+
+// Fecha o modal
+function closeLogsModal() {
+  document.getElementById("logsModal").classList.add("hidden");
+}
+
+// Fecha o modal ao clicar no fundo (fora da caixa)
+document.addEventListener('DOMContentLoaded', function () {
+  const logsModal = document.getElementById('logsModal');
+  if (!logsModal) return;
+
+  logsModal.addEventListener('click', function (e) {
+    // só fecha se o clique for no overlay (fundo escuro), não no conteúdo
+    if (e.target === logsModal) closeLogsModal();
+  });
+});
+
+
     </script>
 
+<!-- Modal de Login Admin -->
+<div id="adminLoginModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6">
+    <h2 class="text-xl font-bold mb-4">Login do Administrador</h2>
+
+    <label class="block text-sm font-medium text-gray-700 mb-1" for="adminUsername">Usuário</label>
+    <input id="adminUsername" type="text" class="w-full mb-3 px-3 py-2 border rounded" placeholder="Ex: vinicius" />
+
+    <label class="block text-sm font-medium text-gray-700 mb-1" for="adminPassword">Senha</label>
+    <input id="adminPassword" type="password" class="w-full mb-4 px-3 py-2 border rounded" placeholder="Sua senha" />
+
+    <div class="flex justify-end gap-2">
+      <button id="cancelAdminLogin" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded">Cancelar</button>
+      <button id="adminLoginBtn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded">Entrar</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal de Logs -->
+<div id="logsModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
+    <h2 class="text-2xl font-bold mb-4">Logs do Sistema</h2>
+    
+    <div id="logsContainer" class="space-y-2 text-sm font-mono text-gray-800">
+      <!-- Logs serão inseridos aqui via JS -->
+    </div>
+
+    <div class="mt-6 text-right">
+      <button onclick="closeLogsModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Tela de Agendamento (modo Admin) - CLONE DA TELA PRINCIPAL -->
+<div id="adminBookingScreen" class="fixed inset-0 bg-white z-40 p-6 hidden overflow-y-auto">
+  <div class="container mx-auto max-w-4xl">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Novo Agendamento (Admin)</h2>
+<button
+  id="closeAdminBookingScreen"
+  type="button"
+  class="text-gray-600 hover:text-red-600 text-2xl relative z-[9999] pointer-events-auto"
+  aria-label="Fechar"
+>&times;</button>
+
+    </div>
+
+    <form id="adminBookingForm" class="p-0 space-y-6">
+      <!-- Nome -->
+      <div>
+        <label for="admin-name" class="block text-sm font-medium text-gray-700 mb-1">Nome completo</label>
+        <input type="text" id="admin-name" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+               placeholder="Digite o nome completo">
+      </div>
+
+      <!-- Setor -->
+      <div>
+        <label for="admin-sector" class="block text-sm font-medium text-gray-700 mb-1">Setor</label>
+        <select id="admin-sector" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+          <option value="TI">TI</option>
+          <option value="RH">RH</option>
+          <option value="Financeiro">Financeiro</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+
+      <!-- Telefone -->
+      <div>
+        <label for="admin-phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+        <input type="tel" id="admin-phone" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+               placeholder="+55 21 99999-9999">
+      </div>
+
+      <!-- Data -->
+      <div>
+        <label for="admin-date" class="block text-sm font-medium text-gray-700 mb-1">Data da reunião</label>
+        <input type="text" id="admin-date" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+               placeholder="Selecione a data">
+      </div>
+
+      <!-- Sala (iguais à tela principal) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Selecione a sala</label>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="admin-roomOptions">
+          <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="203">
+            <i class="fas fa-door-open text-2xl mb-2"></i>
+            <h3 class="font-medium">Sala 203</h3>
+          </div>
+          <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="219">
+            <i class="fas fa-door-open text-2xl mb-2"></i>
+            <h3 class="font-medium">Sala 219</h3>
+          </div>
+          <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="305">
+            <i class="fas fa-door-open text-2xl mb-2"></i>
+            <h3 class="font-medium">Sala 305</h3>
+          </div>
+        </div>
+        <input type="hidden" id="admin-room" required>
+      </div>
+
+      <!-- Horário de início -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Horário de início</label>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2" id="admin-timeSlotsContainer">
+          <!-- Gerado dinamicamente -->
+        </div>
+        <input type="hidden" id="admin-startTime" required>
+      </div>
+
+      <!-- Duração (com bloqueio por disponibilidade) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Duração</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2" id="admin-durationOptions">
+          <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="60">
+            <span class="font-medium">1 hora</span>
+          </div>
+          <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="120">
+            <span class="font-medium">2 horas</span>
+          </div>
+          <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="180">
+            <span class="font-medium">3 horas</span>
+          </div>
+          <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="240">
+            <span class="font-medium">4 horas</span>
+          </div>
+        </div>
+        <input type="hidden" id="admin-duration" required>
+      </div>
+
+      <!-- Repetição -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Repetir reserva</label>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="admin-repeatOptions">
+          <div class="repeat-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-repeat="none">
+            <span class="font-medium">Não repetir</span>
+          </div>
+          <div class="repeat-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-repeat="weekly">
+            <span class="font-medium">Semanalmente</span>
+          </div>
+          <div class="repeat-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-repeat="monthly">
+            <span class="font-medium">Mensalmente</span>
+          </div>
+        </div>
+        <input type="hidden" id="admin-repeat" value="none">
+        <div id="admin-repeatTimesContainer" class="mt-3 hidden">
+          <label for="admin-repeatTimes" class="block text-sm font-medium text-gray-700 mb-1">Quantas vezes repetir?</label>
+          <select id="admin-repeatTimes" class="w-full border rounded px-3 py-2">
+            <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+            <option value="5">5</option><option value="6">6</option><option value="7">7</option>
+            <option value="8">8</option><option value="9">9</option><option value="10">10</option>
+            <option value="11">11</option><option value="12">12</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-md transition duration-300">
+          <i class="fas fa-calendar-plus mr-2"></i> Agendar (Admin)
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ===== CLONE DA LÓGICA PÚBLICA PARA A TELA ADMIN =====
+// Reutiliza: calculateEndTime, getAllBookings, saveBooking, deleteBooking, isTimeSlotAvailable
+
+
+// Init Admin
+function setupAdminBooking() {
+  // Telefone
+  new Cleave('#admin-phone', {
+    phone: true,
+    phoneRegionCode: 'BR',
+    prefix: '+55 ',
+    noImmediatePrefix: true,
+    rawValueTrimPrefix: true
+  });
+
+  // Data
+  flatpickr("#admin-date", {
+    minDate: "today",
+    dateFormat: "d/m/Y",
+    disable: [date => date.getDay() === 0 || date.getDay() === 6],
+    locale: { firstDayOfWeek: 1 },
+    onChange: () => updateAvailableTimeSlotsAdmin()
+  });
+
+  // Sala
+  const roomOptions = document.querySelectorAll('#admin-roomOptions .room-option');
+  roomOptions.forEach(opt => {
+    opt.addEventListener('click', function () {
+      roomOptions.forEach(o => o.classList.remove('selected', 'border-blue-500'));
+      this.classList.add('selected', 'border-blue-500');
+      document.getElementById('admin-room').value = this.dataset.room;
+      updateAvailableTimeSlotsAdmin();
+    });
+  });
+
+  // Duração (seleção)
+  document.querySelectorAll('#admin-durationOptions .duration-option').forEach(opt => {
+    opt.addEventListener('click', function () {
+      document.querySelectorAll('#admin-durationOptions .duration-option').forEach(o => o.classList.remove('selected', 'border-blue-500'));
+      this.classList.add('selected', 'border-blue-500');
+      document.getElementById('admin-duration').value = this.dataset.duration;
+    });
+  });
+
+  // Repetição
+  const repeatOptions = document.querySelectorAll('#admin-repeatOptions .repeat-option');
+  const repeatTimesContainer = document.getElementById('admin-repeatTimesContainer');
+  repeatOptions.forEach(opt => {
+    opt.addEventListener('click', function () {
+      // rótulo semanas/meses
+      const select = document.getElementById('admin-repeatTimes');
+      const label = this.dataset.repeat === 'weekly' ? ' semanas' : ' meses';
+      [...select.options].forEach(o => o.textContent = o.value + label);
+
+      repeatOptions.forEach(o => o.classList.remove('selected', 'border-blue-500'));
+      this.classList.add('selected', 'border-blue-500');
+      document.getElementById('admin-repeat').value = this.dataset.repeat;
+      repeatTimesContainer.classList.toggle('hidden', this.dataset.repeat === 'none');
+    });
+  });
+
+  // Submit
+  document.getElementById('adminBookingForm').addEventListener('submit', handleAdminSubmit);
+}
+
+// Timeslots Admin (espelha a pública)
+async function updateAvailableTimeSlotsAdmin() {
+  const room = document.getElementById('admin-room').value;
+  const date = document.getElementById('admin-date').value;
+  const container = document.getElementById('admin-timeSlotsContainer');
+  container.innerHTML = '';
+  if (!room || !date) return;
+
+  const today = new Date();
+  const [selDay, selMonth, selYear] = date.split('/').map(Number);
+  const selectedDate = new Date(selYear, selMonth - 1, selDay);
+  const isToday = today.toDateString() === selectedDate.toDateString();
+
+  for (let hour = 8; hour <= 21; hour++) {
+    const time = `${hour}:00`;
+
+    // oculta passados (se hoje)
+    if (isToday) {
+      const nowHour = today.getHours();
+      const nowMin = today.getMinutes();
+      const totalNow = nowHour * 60 + nowMin;
+      const timeMin = hour * 60;
+      if (timeMin <= totalNow) continue;
+    }
+
+    const available = await isTimeSlotAvailable(room, date, time, 30);
+    const div = document.createElement('div');
+    div.className = `time-slot cursor-pointer p-2 border rounded-md text-center ${available ? 'border-gray-300' : 'border-gray-200 unavailable'}`;
+    div.textContent = time;
+    div.dataset.time = time;
+
+    if (available) {
+      div.addEventListener('click', async function () {
+        document.querySelectorAll('#admin-timeSlotsContainer .time-slot').forEach(s => s.classList.remove('selected', 'border-blue-500'));
+        this.classList.add('selected', 'border-blue-500');
+        document.getElementById('admin-startTime').value = this.dataset.time;
+
+        // habilita/desabilita durações conforme disponibilidade
+        for (let option of document.querySelectorAll('#admin-durationOptions .duration-option')) {
+          const duration = parseInt(option.dataset.duration);
+          const fits = await isTimeSlotAvailable(room, date, this.dataset.time, duration);
+          if (fits) {
+            option.classList.remove('unavailable', 'opacity-50', 'cursor-not-allowed');
+            option.classList.add('cursor-pointer');
+            option.style.pointerEvents = 'auto';
+          } else {
+            option.classList.remove('selected', 'cursor-pointer');
+            option.classList.add('unavailable', 'opacity-50', 'cursor-not-allowed');
+            option.style.pointerEvents = 'none';
+          }
+        }
+
+        // limpa seleção de duração
+        document.getElementById('admin-duration').value = '';
+        document.querySelectorAll('#admin-durationOptions .duration-option').forEach(opt => opt.classList.remove('selected', 'border-blue-500'));
+      });
+    }
+
+    container.appendChild(div);
+  }
+}
+
+// Envio do Admin (com repetição e modal igual ao público)
+async function handleAdminSubmit(e) {
+  e.preventDefault();
+
+  function onlyDigits(s) {
+    return (s || '').replace(/\D/g, '');
+  }
+
+  function isValidBRPhone(phone) {
+    const digits = onlyDigits(phone);
+    return /^55\d{10,11}$/.test(digits);
+  }
+
+  const requiredFields = [
+    'admin-name',
+    'admin-phone',
+    'admin-date',
+    'admin-room',
+    'admin-startTime',
+    'admin-duration'
+  ];
+
+  let allValid = true;
+
+  for (const id of requiredFields) {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      el.classList.add('border-red-500');
+      allValid = false;
+    } else {
+      el.classList.remove('border-red-500');
+    }
+  }
+
+  // Validação extra de telefone
+  const phoneEl = document.getElementById('admin-phone');
+  if (!isValidBRPhone(phoneEl.value)) {
+    phoneEl.classList.add('border-red-500');
+    alert('Digite um número de telefone válido com DDD.');
+    return;
+  } else {
+    phoneEl.classList.remove('border-red-500');
+  }
+
+  if (!allValid) {
+    alert('Preencha todos os campos obrigatórios.');
+    return;
+  }
+
+  const booking = {
+    name: document.getElementById('admin-name').value,
+    phone: phoneEl.value,
+    sector: document.getElementById('admin-sector').value,
+    room: document.getElementById('admin-room').value,
+    date: document.getElementById('admin-date').value,
+    startTime: document.getElementById('admin-startTime').value,
+    duration: parseInt(document.getElementById('admin-duration').value)
+  };
+
+  const ok = await isTimeSlotAvailable(booking.room, booking.date, booking.startTime, booking.duration);
+  if (!ok) return alert('Este horário está indisponível.');
+
+  const repeat = document.getElementById('admin-repeat').value;
+  const repeatTimes = parseInt(document.getElementById('admin-repeatTimes').value || 0);
+  const bookingsToCreate = [booking];
+
+  if (repeat === 'weekly' || repeat === 'monthly') {
+    let [day, month, year] = booking.date.split('/').map(Number);
+    let originalDate = new Date(year, month - 1, day);
+    for (let i = 1; i < repeatTimes; i++) {
+      let nextDate = new Date(originalDate);
+      if (repeat === 'weekly') nextDate.setDate(originalDate.getDate() + (7 * i));
+      else nextDate.setMonth(originalDate.getMonth() + i);
+      const formatted = nextDate.toLocaleDateString('pt-BR');
+      bookingsToCreate.push({ ...booking, date: formatted });
+    }
+  }
+
+ let allTickets = [];
+for (let i = 0; i < bookingsToCreate.length; i++) {
+  const b = bookingsToCreate[i];
+  const slotOk = await isTimeSlotAvailable(b.room, b.date, b.startTime, b.duration);
+  if (!slotOk) continue;
+
+  const saved = await saveBooking(b);
+  allTickets.push(saved.ticket);
+
+  // Atualiza tickets no MODAL ADMIN em tempo real
+  const ticketsSpanAdmin = document.getElementById('confirmationTicketAdmin');
+  if (ticketsSpanAdmin) ticketsSpanAdmin.textContent = allTickets.join(', ');
+
+  if (i === 0) {
+    document.getElementById('confirmationNameAdmin').textContent  = saved.name;
+    document.getElementById('confirmationRoomAdmin').textContent  = 'Sala ' + saved.room;
+    document.getElementById('confirmationDateAdmin').textContent  = saved.date;
+
+    const [hora, minuto] = saved.start_time.split(':').map(Number);
+    const fim = new Date(0, 0, 0, hora, minuto + saved.duration);
+    const fimStr = fim.toTimeString().slice(0, 5);
+    document.getElementById('confirmationTimeAdmin').textContent = `${saved.start_time} às ${fimStr}`;
+
+    const d = saved.duration, h = Math.floor(d / 60), m = d % 60;
+    document.getElementById('confirmationDurationAdmin').textContent =
+      `${h ? h + 'h' : ''}${m ? (h ? ' ' : '') + m + 'min' : ''}`;
+
+    let repeatLabel = 'Não';
+    if (repeat === 'weekly') repeatLabel = `Semanal – ${repeatTimes}x`;
+    if (repeat === 'monthly') repeatLabel = `Mensal – ${repeatTimes}x`;
+    document.getElementById('confirmationRepeatAdmin').textContent = repeatLabel;
+
+    // Mostra o MODAL **ADMIN**
+    document.getElementById('confirmationModalAdmin').classList.remove('hidden');
+  }
+}
+
+
+  // Reset visual do Admin
+  e.target.reset();
+  document.getElementById('admin-timeSlotsContainer').innerHTML = '';
+  document.querySelectorAll('#admin-roomOptions .room-option').forEach(o => o.classList.remove('selected', 'border-blue-500'));
+  document.querySelectorAll('#admin-durationOptions .duration-option').forEach(o => {
+    o.classList.remove('selected', 'border-blue-500', 'unavailable', 'opacity-50', 'cursor-not-allowed');
+    o.style.pointerEvents = 'auto';
+  });
+  document.getElementById('admin-repeat').value = 'none';
+  document.getElementById('admin-repeatTimesContainer').classList.add('hidden');
+}
+
+function exibirConfirmacaoAdmin(dados) {
+    document.getElementById('confirmationName').innerText = dados.nome;
+    document.getElementById('confirmationRoom').innerText = dados.sala;
+    document.getElementById('confirmationRepeat').innerText = dados.repetir;
+    document.getElementById('confirmationDate').innerText = dados.data;
+    document.getElementById('confirmationTime').innerText = dados.horario;
+    document.getElementById('confirmationDuration').innerText = dados.duracao;
+    document.getElementById('confirmationTicket').innerText = dados.ticket;
+
+    document.getElementById('confirmationModal').classList.remove('hidden');
+}
+
+// garante que a tela admin não fique por cima
+const adminScreen = document.getElementById('adminBookingScreen');
+if (adminScreen) {
+    adminScreen.classList.add('hidden');
+}
+
+// Eventos do modal Admin
+document.getElementById('backToBookingAdmin')?.addEventListener('click', () => {
+  document.getElementById('confirmationModalAdmin').classList.add('hidden');
+  location.reload(); // limpa formulário
+});
+
+document.getElementById('goToConsultAdmin')?.addEventListener('click', () => {
+  window.location.href = '#consulta'; // ou ajuste para a aba correta
+});
+
+
+// Fecha o card de confirmação ao clicar no fundo escuro (overlay)
+const confOverlay = document.getElementById('confirmationModal');
+if (confOverlay) {
+  confOverlay.addEventListener('click', (e) => {
+    if (e.target === confOverlay) {
+      confOverlay.classList.add('hidden');
+    }
+  });
+}
+
+// Fechar clicando fora (overlay) - Admin
+const confAdminOverlay = document.getElementById('confirmationModalAdmin');
+if (confAdminOverlay) {
+  confAdminOverlay.addEventListener('click', (e) => {
+    if (e.target === confAdminOverlay) confAdminOverlay.classList.add('hidden');
+  });
+}
+
+// Botões do modal Admin
+document.getElementById('backToBookingAdmin')?.addEventListener('click', () => {
+  document.getElementById('confirmationModalAdmin').classList.add('hidden');
+});
+
+document.getElementById('goToConsultAdmin')?.addEventListener('click', () => {
+  document.getElementById('confirmationModalAdmin').classList.add('hidden');
+  document.getElementById('consultButton').click();
+});
+
+// ==== FIX definitivo do botão "Painel Admin" ====
+// 1) Se algum overlay ficou aberto por engano, esconde:
+['confirmationModal','confirmationModalAdmin','logsModal','confirmCancelModal',
+ 'adminCancelModal','massCancelConfirmModal','singleCancelConfirmModal','consultCancelSuccess']
+.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+
+// 2) (Re)bind seguro do botão Painel Admin:
+function bindAdminOpen() {
+  const btn   = document.getElementById('adminButton');
+  const modal = document.getElementById('adminLoginModal');
+  if (!btn || !modal) return;
+
+  // remove handlers antigos e aplica um novo
+  btn.replaceWith(btn.cloneNode(true));
+  const newBtn = document.getElementById('adminButton');
+  newBtn.addEventListener('click', () => {
+    modal.classList.remove('hidden');
+  });
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bindAdminOpen);
+} else {
+  bindAdminOpen();
+}
+
+// 3) Loga erros globais pra você ver no console se algo quebrou antes
+window.addEventListener('error', (e) => {
+  console.error('Erro de script:', e.error || e.message);
+});
+
+
+</script>
 </body>
 </html>
