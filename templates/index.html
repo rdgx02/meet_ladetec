@@ -211,17 +211,21 @@
                     </button>
                 </div>
 
-                <!-- Botão de Admin (corrigido) -->
+                <!-- Botão de Admin (abre em nova aba) -->
 <div class="pt-2">
-  <button
-    type="button"
-    id="adminButton"
-    onclick="document.getElementById('adminLoginModal').classList.remove('hidden')"
-    class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-md transition duration-300"
-  >
-    <i class="fas fa-user-shield mr-2"></i> Painel Admin
-  </button>
+  <a
+  id="adminButton"
+  href="/admin.html"
+  target="_blank"
+  rel="noopener"
+  class="block text-center bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-md transition duration-300"
+>
+  <i class="fas fa-user-shield mr-2"></i> Painel Admin
+</a>
+
 </div>
+
+
             </form>
         </div>
     </div>
@@ -1030,10 +1034,19 @@ document.getElementById('consultCancelSuccess').classList.remove('hidden');
 });
 
 
-// Abrir modal de login admin
-document.getElementById('adminButton').addEventListener('click', () => {
-    document.getElementById('adminLoginModal').classList.remove('hidden');
+// Ao carregar a página: se ?admin=1, abre o fluxo de Admin automaticamente
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('admin') === '1') {
+    // Se preferir abrir o LOGIN:
+    const loginModal = document.getElementById('adminLoginModal');
+    if (loginModal) loginModal.classList.remove('hidden');
+
+    // Se quiser pular o login e abrir a tela admin direta, troque a linha acima por:
+    // document.getElementById('adminScreen')?.classList.remove('hidden');
+  }
 });
+
 
 // Cancelar login admin
 document.getElementById('cancelAdminLogin').addEventListener('click', () => {
@@ -1898,35 +1911,6 @@ document.getElementById('goToConsultAdmin')?.addEventListener('click', () => {
   document.getElementById('consultButton').click();
 });
 
-// ==== FIX definitivo do botão "Painel Admin" ====
-// 1) Se algum overlay ficou aberto por engano, esconde:
-['confirmationModal','confirmationModalAdmin','logsModal','confirmCancelModal',
- 'adminCancelModal','massCancelConfirmModal','singleCancelConfirmModal','consultCancelSuccess']
-.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
-
-// 2) (Re)bind seguro do botão Painel Admin:
-function bindAdminOpen() {
-  const btn   = document.getElementById('adminButton');
-  const modal = document.getElementById('adminLoginModal');
-  if (!btn || !modal) return;
-
-  // remove handlers antigos e aplica um novo
-  btn.replaceWith(btn.cloneNode(true));
-  const newBtn = document.getElementById('adminButton');
-  newBtn.addEventListener('click', () => {
-    modal.classList.remove('hidden');
-  });
-}
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', bindAdminOpen);
-} else {
-  bindAdminOpen();
-}
-
-// 3) Loga erros globais pra você ver no console se algo quebrou antes
-window.addEventListener('error', (e) => {
-  console.error('Erro de script:', e.error || e.message);
-});
 
 
 </script>

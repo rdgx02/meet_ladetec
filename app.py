@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template, session
+from flask import Flask, request, jsonify, send_from_directory, render_template, session, redirect
 from flask_cors import CORS
 from models.database import init_db, insert_booking, get_all_bookings, delete_booking
 import random
@@ -233,6 +233,24 @@ def get_logs():
     logs = get_all_logs()
     logs = [l for l in logs if str(l.get("action", "")).lower() != "login_success"]
     return jsonify(logs)
+
+@app.route('/admin.html')
+def admin_page():
+    if 'user_id' not in session:
+        return redirect('/')  # Redireciona para a tela pública se não estiver logado
+    return send_from_directory('static', 'admin.html')  # Serve o painel admin
+
+@app.route('/auth/me', methods=['GET'])
+def auth_me():
+    if 'user_id' in session:
+        return jsonify({
+            "ok": True,
+            "id": session['user_id'],
+            "name": session.get('user_name'),
+            "role": session.get('role')
+        })
+    return jsonify({"ok": False}), 401
+
 
 # ✅ Rodar na rede para acesso via celular (Wi-Fi)
 if __name__ == '__main__':

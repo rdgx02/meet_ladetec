@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel de Administração — Agendamento de Salas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.6.0/cleave.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.6.0/addons/cleave-phone.br.js"></script>
+  <style>
+    .room-option{transition:all .3s ease;}
+    .room-option:hover{transform:translateY(-2px);}
+    .room-option.selected{background-color:#3b82f6;color:#fff;}
+    .time-slot{transition:all .2s ease;}
+    .time-slot:hover{background-color:#e5e7eb;}
+    .time-slot.selected{background-color:#3b82f6;color:#fff;}
+    .time-slot.unavailable{background-color:#f3f4f6;color:#9ca3af;cursor:not-allowed;}
+    .duration-option{transition:all .2s ease;}
+    .duration-option:hover{background-color:#e5e7eb;}
+    .duration-option.selected{background-color:#3b82f6;color:#fff;}
+    .duration-option.unavailable{background-color:#f3f4f6!important;color:#9ca3af!important;border-color:#d1d5db!important;}
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Tela de Admin -->
+  <div id="adminScreen" class="p-6">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Painel de Administração – <span id="adminUserName" class="font-semibold"></span></h2>
+        <div class="flex items-center gap-4">
+          <button id="adminLogoutBtn" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded">
+            <i class="fas fa-sign-out-alt mr-1"></i> Sair
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por data</label>
+            <input type="text" id="adminDate" class="w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="Selecione a data">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Pesquisar</label>
+            <input type="text" id="adminSearch" class="w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="Nome, Sala, Ticket...">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Setor</label>
+            <select id="adminSector" class="w-full px-4 py-2 border border-gray-300 rounded-md">
+              <option value="">Todos</option>
+              <option value="TI">TI</option>
+              <option value="RH">RH</option>
+              <option value="Financeiro">Financeiro</option>
+              <option value="Marketing">Marketing</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="searchAdmin" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">
+            <i class="fas fa-search mr-2"></i> Filtrar
+          </button>
+          <button id="clearAdminFilters" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">
+            <i class="fas fa-eraser mr-2"></i> Limpar
+          </button>
+          <button id="viewLogsBtn" class="flex-1 bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded">
+            <i class="fas fa-list-alt mr-1"></i> Ver Logs
+          </button>
+          <button id="openAdminBookingBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
+            <i class="fas fa-calendar-plus mr-2"></i> Novo Agendamento (Admin)
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <button id="deleteSelectedBtn" class="mb-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+          <i class="fas fa-trash mr-1"></i> Cancelar Selecionados
+        </button>
+
+        <table class="min-w-full bg-white rounded-lg overflow-hidden">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-4 py-2 text-center">
+                <input type="checkbox" id="selectAllCheckboxes" />
+              </th>
+              <th class="px-4 py-2 text-left">ID</th>
+              <th class="px-4 py-2 text-left">Nome</th>
+              <th class="px-4 py-2 text-left">Setor</th>
+              <th class="px-4 py-2 text-left">Sala</th>
+              <th class="px-4 py-2 text-left">Data</th>
+              <th class="px-4 py-2 text-left">Início</th>
+              <th class="px-4 py-2 text-left">Fim</th>
+              <th class="px-4 py-2 text-left">Ticket</th>
+              <th class="px-4 py-2 text-left">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="adminResults" class="divide-y divide-gray-200"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação (Admin) -->
+  <div id="confirmationModalAdmin" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full">
+      <div class="text-center mb-4">
+        <i class="fas fa-check-circle text-green-500 text-5xl mb-3"></i>
+        <h3 class="text-xl font-bold">Agendamento realizado com sucesso (Admin)!</h3>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="flex justify-between border-b pb-2"><span class="font-medium">Nome:</span><span id="confirmationNameAdmin"></span></div>
+        <div class="flex justify-between border-b pb-2"><span class="font-medium">Sala:</span><span id="confirmationRoomAdmin"></span></div>
+        <div class="flex justify-between border-b pb-2"><span class="font-medium">Repetição:</span><span id="confirmationRepeatAdmin"></span></div>
+        <div class="flex justify-between border-b pb-2"><span class="font-medium">Data:</span><span id="confirmationDateAdmin"></span></div>
+        <div class="flex justify-between border-b pb-2"><span class="font-medium">Horário:</span><span id="confirmationTimeAdmin"></span></div>
+        <div class="flex justify-between border-b pb-2"><span class="font-medium">Duração:</span><span id="confirmationDurationAdmin"></span></div>
+        <div class="flex justify-between border-b pb-2"><span class="font-medium">Ticket(s):</span><span id="confirmationTicketAdmin" class="font-bold"></span></div>
+      </div>
+      <div class="flex space-x-3">
+        <button id="backToBookingAdmin" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded"><i class="fas fa-arrow-left mr-2"></i>Novo Agendamento</button>
+        <button id="goToConsultAdmin" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"><i class="fas fa-search mr-2"></i> Consultar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Cancelamento em Massa (confirmação) -->
+  <div id="massCancelConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full text-center shadow-lg">
+      <i class="fas fa-exclamation-circle text-yellow-500 text-5xl mb-3"></i>
+      <h3 class="text-xl font-bold mb-2">Tem certeza?</h3>
+      <p id="massCancelText" class="text-gray-700 mb-4"></p>
+      <div class="flex justify-center space-x-4">
+        <button id="massCancelConfirmBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"><i class="fas fa-check mr-1"></i> Confirmar</button>
+        <button id="massCancelCancelBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Cancelamento em Massa (sucesso) -->
+  <div id="adminCancelModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full text-center shadow-lg">
+      <i class="fas fa-check-circle text-red-500 text-5xl mb-3"></i>
+      <h3 class="text-xl font-bold mb-2">Cancelamentos realizados</h3>
+      <p id="adminCancelCount" class="text-gray-700 mb-4"></p>
+      <button id="closeAdminCancelModal" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"><i class="fas fa-check mr-1"></i> OK</button>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação Individual -->
+  <div id="singleCancelConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full text-center shadow-lg">
+      <i class="fas fa-exclamation-circle text-yellow-500 text-5xl mb-3"></i>
+      <h3 class="text-xl font-bold mb-2">Cancelar agendamento</h3>
+      <p class="text-gray-700 mb-4">Tem certeza que deseja cancelar este agendamento?</p>
+      <div class="flex justify-center space-x-4">
+        <button id="singleCancelConfirmBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"><i class="fas fa-check mr-1"></i> Confirmar</button>
+        <button id="singleCancelCancelBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Logs -->
+  <div id="logsModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-4">Logs do Sistema</h2>
+      <div id="logsContainer" class="space-y-2 text-sm font-mono text-gray-800"></div>
+      <div class="mt-6 text-right">
+        <button id="closeLogsBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tela de Agendamento (modo Admin) -->
+  <div id="adminBookingScreen" class="fixed inset-0 bg-white z-40 p-6 hidden overflow-y-auto">
+    <div class="container mx-auto max-w-4xl">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Novo Agendamento (Admin)</h2>
+        <button id="closeAdminBookingScreen" type="button" class="text-gray-600 hover:text-red-600 text-2xl">&times;</button>
+      </div>
+
+      <form id="adminBookingForm" class="p-0 space-y-6">
+        <div>
+          <label for="admin-name" class="block text-sm font-medium text-gray-700 mb-1">Nome completo</label>
+          <input type="text" id="admin-name" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Digite o nome completo">
+        </div>
+
+        <div>
+          <label for="admin-sector" class="block text-sm font-medium text-gray-700 mb-1">Setor</label>
+          <select id="admin-sector" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <option value="TI">TI</option><option value="RH">RH</option><option value="Financeiro">Financeiro</option><option value="Marketing">Marketing</option><option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="admin-phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+          <input type="tel" id="admin-phone" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="+55 21 99999-9999">
+        </div>
+
+        <div>
+          <label for="admin-date" class="block text-sm font-medium text-gray-700 mb-1">Data da reunião</label>
+          <input type="text" id="admin-date" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Selecione a data">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Selecione a sala</label>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="admin-roomOptions">
+            <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="203"><i class="fas fa-door-open text-2xl mb-2"></i><h3 class="font-medium">Sala 203</h3></div>
+            <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="219"><i class="fas fa-door-open text-2xl mb-2"></i><h3 class="font-medium">Sala 219</h3></div>
+            <div class="room-option cursor-pointer p-4 border border-gray-300 rounded-md text-center" data-room="305"><i class="fas fa-door-open text-2xl mb-2"></i><h3 class="font-medium">Sala 305</h3></div>
+          </div>
+          <input type="hidden" id="admin-room" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Horário de início</label>
+          <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2" id="admin-timeSlotsContainer"></div>
+          <input type="hidden" id="admin-startTime" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Duração</label>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2" id="admin-durationOptions">
+            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="60"><span class="font-medium">1 hora</span></div>
+            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="120"><span class="font-medium">2 horas</span></div>
+            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="180"><span class="font-medium">3 horas</span></div>
+            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="240"><span class="font-medium">4 horas</span></div>
+          </div>
+          <input type="hidden" id="admin-duration" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Repetir reserva</label>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="admin-repeatOptions">
+            <div class="repeat-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-repeat="none"><span class="font-medium">Não repetir</span></div>
+            <div class="repeat-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-repeat="weekly"><span class="font-medium">Semanalmente</span></div>
+            <div class="repeat-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-repeat="monthly"><span class="font-medium">Mensalmente</span></div>
+          </div>
+          <input type="hidden" id="admin-repeat" value="none">
+          <div id="admin-repeatTimesContainer" class="mt-3 hidden">
+            <label for="admin-repeatTimes" class="block text-sm font-medium text-gray-700 mb-1">Quantas vezes repetir?</label>
+            <select id="admin-repeatTimes" class="w-full border rounded px-3 py-2">
+              <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+              <option value="5">5</option><option value="6">6</option><option value="7">7</option>
+              <option value="8">8</option><option value="9">9</option><option value="10">10</option>
+              <option value="11">11</option><option value="12">12</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-md transition duration-300">
+            <i class="fas fa-calendar-plus mr-2"></i> Agendar (Admin)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  // ===== Verifica sessão ao carregar =====
+  (async () => {
+    try {
+      const r = await fetch('/auth/me');
+      if (!r.ok) { location.href = '/'; return; }
+      const me = await r.json();
+      const el = document.getElementById('adminUserName');
+      if (el && me.name) el.textContent = me.name || '';
+    } catch(e) {
+      location.href = '/';
+    }
+  })();
+
+  // ===== Helpers comuns =====
+  function calculateEndTime(startTime, duration) {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const total = hours*60 + minutes + Number(duration||0);
+    const eh = Math.floor(total/60);
+    const em = total % 60;
+    return `${eh}:${String(em).padStart(2,'0')}`;
+  }
+
+  async function getAllBookings() {
+    const res = await fetch('/api/bookings');
+    return await res.json();
+  }
+
+  async function saveBooking(booking) {
+    const res = await fetch('/api/bookings', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(booking)
+    });
+    return await res.json();
+  }
+
+  async function deleteBooking(id) {
+    await fetch(`/api/bookings/${id}`, { method:'DELETE' });
+  }
+
+  async function isTimeSlotAvailable(room, date, startTime, duration) {
+    const bookings = await getAllBookings();
+    const [h, m] = startTime.split(':').map(Number);
+    const st = h*60 + m;
+    const et = st + duration;
+    return !bookings.some(b=>{
+      if (b.room !== room || b.date !== date) return false;
+      const [bh, bm] = b.start_time.split(':').map(Number);
+      const bs = bh*60 + bm;
+      const be = bs + b.duration;
+      return !(et <= bs || st >= be);
+    });
+  }
+
+  // ===== Admin: filtros, listagem, seleção =====
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Flatpickr do admin
+    flatpickr("#adminDate", { dateFormat:"d/m/Y", locale:{ firstDayOfWeek:1 } });
+
+    // Carregar agendamentos na entrada
+    await applyAdminFilter();
+
+    // Ações de filtro
+    document.getElementById('searchAdmin').addEventListener('click', applyAdminFilter);
+    document.getElementById('clearAdminFilters').addEventListener('click', async ()=>{
+      document.getElementById('adminDate').value='';
+      document.getElementById('adminSearch').value='';
+      document.getElementById('adminSector').value='';
+      await applyAdminFilter();
+    });
+
+    // Select all
+    document.getElementById('selectAllCheckboxes').addEventListener('change', function(){
+      document.querySelectorAll('.rowCheckbox').forEach(cb=>cb.checked=this.checked);
+    });
+
+    // Cancelar Selecionados
+    document.getElementById('deleteSelectedBtn').addEventListener('click', ()=>{
+      const selected = document.querySelectorAll('.rowCheckbox:checked');
+      if (selected.length===0){ alert('Nenhuma reserva selecionada.'); return; }
+      document.getElementById('massCancelText').textContent = `Tem certeza que deseja cancelar ${selected.length} reserva(s)?`;
+      document.getElementById('massCancelConfirmModal').classList.remove('hidden');
+
+      document.getElementById('massCancelConfirmBtn').onclick = async () => {
+        for (const cb of selected) {
+          const id = cb.dataset.id;
+          await deleteBooking(id);
+          cb.closest('tr')?.remove();
+        }
+        document.getElementById('adminCancelCount').textContent = `${selected.length} reserva(s) cancelada(s) com sucesso.`;
+        document.getElementById('massCancelConfirmModal').classList.add('hidden');
+        document.getElementById('adminCancelModal').classList.remove('hidden');
+      };
+      document.getElementById('massCancelCancelBtn').onclick = () => {
+        document.getElementById('massCancelConfirmModal').classList.add('hidden');
+      };
+    });
+
+    // Delegation para cancelar individual
+    document.getElementById('adminResults').addEventListener('click', (e)=>{
+      const btn = e.target.closest('.cancelBtn');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const modal = document.getElementById('singleCancelConfirmModal');
+      modal.classList.remove('hidden');
+      document.getElementById('singleCancelConfirmBtn').onclick = async ()=>{
+        await deleteBooking(id);
+        btn.closest('tr')?.remove();
+        modal.classList.add('hidden');
+      };
+      document.getElementById('singleCancelCancelBtn').onclick = ()=> modal.classList.add('hidden');
+    });
+
+    // Logs modal
+    document.getElementById('viewLogsBtn').addEventListener('click', loadLogs);
+    document.getElementById('closeLogsBtn').addEventListener('click', ()=> {
+      document.getElementById('logsModal').classList.add('hidden');
+    });
+    document.getElementById('logsModal').addEventListener('click', (e)=>{
+      if (e.target.id === 'logsModal') document.getElementById('logsModal').classList.add('hidden');
+    });
+
+    // Novo agendamento (Admin)
+    document.getElementById('openAdminBookingBtn').addEventListener('click', ()=>{
+      document.getElementById('adminBookingScreen').classList.remove('hidden');
+      if (!document.getElementById('adminBookingScreen').dataset.ready) {
+        setupAdminBooking();
+        document.getElementById('adminBookingScreen').dataset.ready = '1';
+      }
+    });
+    document.getElementById('closeAdminBookingScreen').addEventListener('click', ()=>{
+      document.getElementById('adminBookingScreen').classList.add('hidden');
+    });
+
+    // Modal Admin OKs
+    document.getElementById('backToBookingAdmin').addEventListener('click', ()=>{
+      document.getElementById('confirmationModalAdmin').classList.add('hidden');
+      location.reload();
+    });
+    document.getElementById('goToConsultAdmin').addEventListener('click', ()=>{
+      document.getElementById('confirmationModalAdmin').classList.add('hidden');
+    });
+    document.getElementById('closeAdminCancelModal').addEventListener('click', ()=>{
+      document.getElementById('adminCancelModal').classList.add('hidden');
+    });
+  });
+
+  async function applyAdminFilter(){
+    const filterDate = (document.getElementById('adminDate').value||'').trim();
+    const filterSearch = (document.getElementById('adminSearch').value||'').toLowerCase();
+    const filterSector = (document.getElementById('adminSector').value||'').trim();
+
+    const bookings = await getAllBookings();
+    const tbody = document.getElementById('adminResults');
+    tbody.innerHTML = '';
+
+    const filtered = bookings.filter(b=>{
+      const matchDate = !filterDate || b.date === filterDate;
+      const matchSector = !filterSector || b.sector === filterSector;
+      const matchSearch = !filterSearch || (
+        (b.name||'').toLowerCase().includes(filterSearch) ||
+        String(b.room||'').toLowerCase().includes(filterSearch) ||
+        String(b.start_time||'').toLowerCase().includes(filterSearch) ||
+        String(b.ticket||'').toLowerCase().includes(filterSearch)
+      );
+      return matchDate && matchSector && matchSearch;
+    });
+
+    filtered.forEach(b=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="px-4 py-2 text-center">
+          <input type="checkbox" class="rowCheckbox" data-id="${b.id}">
+        </td>
+        <td class="px-4 py-2">${b.id}</td>
+        <td class="px-4 py-2">${b.name}</td>
+        <td class="px-4 py-2">${b.sector}</td>
+        <td class="px-4 py-2">${b.room}</td>
+        <td class="px-4 py-2">${b.date}</td>
+        <td class="px-4 py-2">${b.start_time}</td>
+        <td class="px-4 py-2">${calculateEndTime(b.start_time, b.duration)}</td>
+        <td class="px-4 py-2">${b.ticket}</td>
+        <td class="px-4 py-2">
+          <button data-id="${b.id}" class="cancelBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm shadow">
+            <i class="fas fa-trash-alt"></i> Cancelar
+          </button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ===== Logs =====
+  async function loadLogs(){
+    try{
+      const res = await fetch('/api/logs');
+      const logs = await res.json();
+      const container = document.getElementById('logsContainer');
+      container.innerHTML = '';
+      if (!logs.length){
+        container.innerHTML = "<p class='text-gray-600'>Nenhum log encontrado.</p>";
+      } else {
+        logs.forEach(log=>{
+          const el = document.createElement('div');
+          el.className = "border border-gray-300 p-2 rounded bg-gray-50";
+          el.innerHTML = `
+            <div><strong>Ação:</strong> ${log.action || '-'}</div>
+            <div><strong>Usuário:</strong> ${log.user_name || '-'}</div>
+            <div><strong>Entidade:</strong> ${log.entity || '-'}</div>
+            <div><strong>Detalhes:</strong></div>
+            <div class="text-sm text-gray-700 whitespace-pre-line">${
+              (()=>{ try{
+                const d = JSON.parse(log.details||'{}');
+                let formatted = Object.entries(d).map(([k,v])=>`${k}: ${v}`).join("\n");
+                if (log.entity_id) formatted = `id: ${log.entity_id}\n` + formatted;
+                return formatted || '-';
+              }catch{ return log.details || '-'; } })()
+            }</div>
+            <div><strong>IP:</strong> ${log.ip || '-'}</div>
+            <div><strong>Data:</strong> ${log.timestamp || '-'}</div>`;
+          container.appendChild(el);
+        });
+      }
+      document.getElementById('logsModal').classList.remove('hidden');
+    }catch(e){
+      alert('Erro ao carregar logs.');
+      console.error(e);
+    }
+  }
+
+  // ===== Admin Booking (clone da lógica pública) =====
+  function setupAdminBooking(){
+    new Cleave('#admin-phone', { phone:true, phoneRegionCode:'BR', prefix:'+55 ', noImmediatePrefix:true, rawValueTrimPrefix:true });
+    flatpickr("#admin-date", {
+      minDate:"today", dateFormat:"d/m/Y",
+      disable:[d=>d.getDay()===0||d.getDay()===6],
+      locale:{firstDayOfWeek:1},
+      onChange: ()=> updateAvailableTimeSlotsAdmin()
+    });
+
+    const roomOptions = document.querySelectorAll('#admin-roomOptions .room-option');
+    roomOptions.forEach(opt=>{
+      opt.addEventListener('click', function(){
+        roomOptions.forEach(o=>o.classList.remove('selected','border-blue-500'));
+        this.classList.add('selected','border-blue-500');
+        document.getElementById('admin-room').value = this.dataset.room;
+        updateAvailableTimeSlotsAdmin();
+      });
+    });
+
+    document.querySelectorAll('#admin-durationOptions .duration-option').forEach(opt=>{
+      opt.addEventListener('click', function(){
+        document.querySelectorAll('#admin-durationOptions .duration-option').forEach(o=>o.classList.remove('selected','border-blue-500'));
+        this.classList.add('selected','border-blue-500');
+        document.getElementById('admin-duration').value = this.dataset.duration;
+      });
+    });
+
+    const repeatOptions = document.querySelectorAll('#admin-repeatOptions .repeat-option');
+    const repeatTimesContainer = document.getElementById('admin-repeatTimesContainer');
+    repeatOptions.forEach(opt=>{
+      opt.addEventListener('click', function(){
+        const select = document.getElementById('admin-repeatTimes');
+        const label = this.dataset.repeat === 'weekly' ? ' semanas' : ' meses';
+        [...select.options].forEach(o=>o.textContent = o.value + label);
+
+        repeatOptions.forEach(o=>o.classList.remove('selected','border-blue-500'));
+        this.classList.add('selected','border-blue-500');
+        document.getElementById('admin-repeat').value = this.dataset.repeat;
+        repeatTimesContainer.classList.toggle('hidden', this.dataset.repeat==='none');
+      });
+    });
+
+    document.getElementById('adminBookingForm').addEventListener('submit', handleAdminSubmit);
+  }
+
+  async function updateAvailableTimeSlotsAdmin(){
+    const room = document.getElementById('admin-room').value;
+    const date = document.getElementById('admin-date').value;
+    const container = document.getElementById('admin-timeSlotsContainer');
+    container.innerHTML = '';
+    if (!room || !date) return;
+
+    const today = new Date();
+    const [d,m,y] = date.split('/').map(Number);
+    const selected = new Date(y, m-1, d);
+    const isToday = today.toDateString() === selected.toDateString();
+
+    for (let hour=8; hour<=21; hour++){
+      const time = `${hour}:00`;
+      if (isToday){
+        const totalNow = today.getHours()*60 + today.getMinutes();
+        if (hour*60 <= totalNow) continue;
+      }
+
+      const available = await isTimeSlotAvailable(room, date, time, 30);
+      const div = document.createElement('div');
+      div.className = `time-slot cursor-pointer p-2 border rounded-md text-center ${available?'border-gray-300':'border-gray-200 unavailable'}`;
+      div.textContent = time;
+      div.dataset.time = time;
+
+      if (available){
+        div.addEventListener('click', async function(){
+          document.querySelectorAll('#admin-timeSlotsContainer .time-slot').forEach(s=>s.classList.remove('selected','border-blue-500'));
+          this.classList.add('selected','border-blue-500');
+          document.getElementById('admin-startTime').value = this.dataset.time;
+
+          for (let option of document.querySelectorAll('#admin-durationOptions .duration-option')){
+            const duration = parseInt(option.dataset.duration);
+            const fits = await isTimeSlotAvailable(room, date, this.dataset.time, duration);
+            if (fits){
+              option.classList.remove('unavailable','opacity-50','cursor-not-allowed');
+              option.classList.add('cursor-pointer');
+              option.style.pointerEvents='auto';
+            } else {
+              option.classList.remove('selected','cursor-pointer');
+              option.classList.add('unavailable','opacity-50','cursor-not-allowed');
+              option.style.pointerEvents='none';
+            }
+          }
+          document.getElementById('admin-duration').value='';
+          document.querySelectorAll('#admin-durationOptions .duration-option').forEach(o=>o.classList.remove('selected','border-blue-500'));
+        });
+      }
+      container.appendChild(div);
+    }
+  }
+
+  async function handleAdminSubmit(e){
+    e.preventDefault();
+
+    function onlyDigits(s){ return (s||'').replace(/\D/g,''); }
+    function isValidBRPhone(phone){ return /^55\d{10,11}$/.test(onlyDigits(phone)); }
+
+    const required = ['admin-name','admin-phone','admin-date','admin-room','admin-startTime','admin-duration'];
+    let ok = true;
+    for (const id of required){
+      const el = document.getElementById(id);
+      if (!el.value.trim()){ el.classList.add('border-red-500'); ok=false; } else el.classList.remove('border-red-500');
+    }
+
+    const phoneEl = document.getElementById('admin-phone');
+    if (!isValidBRPhone(phoneEl.value)){ phoneEl.classList.add('border-red-500'); alert('Digite um número de telefone válido com DDD.'); return; }
+    else phoneEl.classList.remove('border-red-500');
+
+    if (!ok){ alert('Preencha todos os campos obrigatórios.'); return; }
+
+    const booking = {
+      name: document.getElementById('admin-name').value,
+      phone: phoneEl.value,
+      sector: document.getElementById('admin-sector').value,
+      room: document.getElementById('admin-room').value,
+      date: document.getElementById('admin-date').value,
+      startTime: document.getElementById('admin-startTime').value,
+      duration: parseInt(document.getElementById('admin-duration').value)
+    };
+
+    const free = await isTimeSlotAvailable(booking.room, booking.date, booking.startTime, booking.duration);
+    if (!free) return alert('Este horário está indisponível.');
+
+    const repeat = document.getElementById('admin-repeat').value;
+    const repeatTimes = parseInt(document.getElementById('admin-repeatTimes').value || 0);
+    const toCreate = [booking];
+
+    if (repeat==='weekly' || repeat==='monthly'){
+      let [day, month, year] = booking.date.split('/').map(Number);
+      let base = new Date(year, month-1, day);
+      for (let i=1; i<repeatTimes; i++){
+        let next = new Date(base);
+        if (repeat==='weekly') next.setDate(base.getDate() + 7*i);
+        else next.setMonth(base.getMonth() + i);
+        const formatted = next.toLocaleDateString('pt-BR');
+        toCreate.push({ ...booking, date: formatted });
+      }
+    }
+
+    let tickets = [];
+    for (let i=0; i<toCreate.length; i++){
+      const b = toCreate[i];
+      const slotOk = await isTimeSlotAvailable(b.room, b.date, b.startTime, b.duration);
+      if (!slotOk) continue;
+
+      const saved = await saveBooking(b);
+      tickets.push(saved.ticket);
+      const ticketsSpanAdmin = document.getElementById('confirmationTicketAdmin');
+      if (ticketsSpanAdmin) ticketsSpanAdmin.textContent = tickets.join(', ');
+
+      if (i===0){
+        document.getElementById('confirmationNameAdmin').textContent = saved.name;
+        document.getElementById('confirmationRoomAdmin').textContent = 'Sala ' + saved.room;
+        document.getElementById('confirmationDateAdmin').textContent = saved.date;
+
+        const [h,mi] = saved.start_time.split(':').map(Number);
+        const end = new Date(0,0,0,h, mi + saved.duration);
+        const endStr = end.toTimeString().slice(0,5);
+        document.getElementById('confirmationTimeAdmin').textContent = `${saved.start_time} às ${endStr}`;
+
+        const d = saved.duration, hh = Math.floor(d/60), mm = d%60;
+        document.getElementById('confirmationDurationAdmin').textContent =
+          `${hh?hh+'h':''}${mm?(hh?' ':'')+mm+'min':''}`;
+
+        let repLabel='Não';
+        if (repeat==='weekly') repLabel = `Semanal – ${repeatTimes}x`;
+        if (repeat==='monthly') repLabel = `Mensal – ${repeatTimes}x`;
+        document.getElementById('confirmationRepeatAdmin').textContent = repLabel;
+
+        document.getElementById('confirmationModalAdmin').classList.remove('hidden');
+      }
+    }
+
+    // Reset visual e fecha tela
+    e.target.reset();
+    document.getElementById('admin-timeSlotsContainer').innerHTML='';
+    document.querySelectorAll('#admin-roomOptions .room-option').forEach(o=>o.classList.remove('selected','border-blue-500'));
+    document.querySelectorAll('#admin-durationOptions .duration-option').forEach(o=>{
+      o.classList.remove('selected','border-blue-500','unavailable','opacity-50','cursor-not-allowed');
+      o.style.pointerEvents='auto';
+    });
+    document.getElementById('admin-repeat').value='none';
+    document.getElementById('admin-repeatTimesContainer').classList.add('hidden');
+
+    // Atualiza tabela principal
+    await applyAdminFilter();
+  }
+
+// Fechar o modal de confirmação (Admin) ao clicar no fundo escuro
+const overlayAdmin = document.getElementById('confirmationModalAdmin');
+overlayAdmin.addEventListener('click', (e) => {
+  // só fecha se o clique for no overlay (fora do card)
+  if (e.target === e.currentTarget) {
+    overlayAdmin.classList.add('hidden');
+  }
+});
+
+// Opcional: também fechar com a tecla ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !overlayAdmin.classList.contains('hidden')) {
+    overlayAdmin.classList.add('hidden');
+  }
+});
+
+
+</script>
+
+</body>
+</html>
