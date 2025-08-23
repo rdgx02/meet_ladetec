@@ -47,7 +47,6 @@ def enviar_para_n8n(dados):
         print(dados)
 
         headers = {"apikey": API_KEY}
-
         resposta = requests.post(N8N_WEBHOOK_URL, json=dados, headers=headers)
 
         print("🔄 Status Code:", resposta.status_code)
@@ -68,6 +67,7 @@ def index():
 def static_files(filename):
     return send_from_directory('static', filename)
 
+# ====== LOGIN/LOGOUT E SESSÃO ======
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
     data = request.get_json(force=True)
@@ -124,12 +124,6 @@ def admin_logout():
     session.pop("role", None)
     return jsonify({"ok": True})
 
-@app.route('/admin.html')
-def admin_page():
-    if 'user_id' not in session:
-        return redirect('/')  # bloqueia quem não está logado
-    return send_from_directory('static', 'admin.html')
-
 @app.route('/auth/me', methods=['GET'])
 def auth_me():
     if 'user_id' in session:
@@ -141,7 +135,25 @@ def auth_me():
         })
     return jsonify({"ok": False}), 401
 
+# ====== ENTRADA DO ADMIN (decide login/painel) ======
+@app.route('/admin')
+def admin_entry():
+    """
+    Se logado: serve o painel (static/admin.html)
+    Se não logado: mostra tela de login (static/admin_login.html)
+    """
+    if 'user_id' in session:
+        return send_from_directory('static', 'admin.html')
+    return send_from_directory('static', 'admin_login.html')
 
+# Compatibilidade para quem acessar /admin.html direto
+@app.route('/admin.html')
+def admin_html_direct():
+    if 'user_id' not in session:
+        return redirect('/admin')
+    return send_from_directory('static', 'admin.html')
+
+# ====== API DE AGENDAMENTOS ======
 @app.route('/api/bookings', methods=['GET'])
 def get_bookings():
     rows = get_all_bookings()
@@ -225,7 +237,6 @@ def create_booking():
         'ticket': ticket
     })
 
-
 @app.route('/api/bookings/<int:booking_id>', methods=['DELETE'])
 def remove_booking(booking_id):
     user_id = session.get("user_id")
@@ -253,14 +264,14 @@ def remove_booking(booking_id):
 
     return '', 204
 
+# ====== API DE LOGS ======
 @app.route('/api/logs', methods=['GET'])
 def get_logs():
     logs = get_all_logs()
     logs = [l for l in logs if str(l.get("action", "")).lower() != "login_success"]
     return jsonify(logs)
 
-
-
 # ✅ Rodar na rede para acesso via celular (Wi-Fi)
 if __name__ == '__main__':
+    print(">> Rodando app.py de:", os.path.abspath(__file__))
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — Painel Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white w-full max-w-sm rounded-lg shadow p-6">
+    <h1 class="text-xl font-bold mb-4 text-center">Acesso ao Painel</h1>
+
+    <div class="space-y-3">
+      <div>
+        <label class="block text-sm font-medium mb-1">Usuário</label>
+        <input id="username" class="w-full border rounded px-3 py-2" placeholder="ex: vinicius"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Senha</label>
+        <input id="password" type="password" class="w-full border rounded px-3 py-2" placeholder="••••••••"/>
+      </div>
+      <button id="loginBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded">
+        <i class="fas fa-sign-in-alt mr-2"></i> Entrar
+      </button>
+      <a href="/" class="block text-center text-sm text-gray-600 hover:underline mt-2">Voltar</a>
+    </div>
+
+    <p id="msg" class="text-red-600 text-sm mt-3 hidden"></p>
+  </div>
+
+  <script>
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const msg = document.getElementById('msg');
+
+      msg.classList.add('hidden');
+      try {
+        const r = await fetch('/admin/login', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          credentials: 'same-origin',
+          body: JSON.stringify({ username, password })
+        });
+        const data = await r.json();
+        if (!r.ok || !data.ok) {
+          msg.textContent = data.message || 'Usuário ou senha inválidos.';
+          msg.classList.remove('hidden');
+          return;
+        }
+        // logou: volta para /admin (que agora entregará o admin.html)
+        location.href = '/admin';
+      } catch (e) {
+        msg.textContent = 'Falha ao conectar. Tente novamente.';
+        msg.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
