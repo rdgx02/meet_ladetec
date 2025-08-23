@@ -117,6 +117,31 @@ def admin_login():
         "role": user["role"]
     })
 
+@app.route('/admin/logout', methods=['POST'])
+def admin_logout():
+    session.pop("user_id", None)
+    session.pop("user_name", None)
+    session.pop("role", None)
+    return jsonify({"ok": True})
+
+@app.route('/admin.html')
+def admin_page():
+    if 'user_id' not in session:
+        return redirect('/')  # bloqueia quem não está logado
+    return send_from_directory('static', 'admin.html')
+
+@app.route('/auth/me', methods=['GET'])
+def auth_me():
+    if 'user_id' in session:
+        return jsonify({
+            "ok": True,
+            "id": session['user_id'],
+            "name": session.get('user_name'),
+            "role": session.get('role')
+        })
+    return jsonify({"ok": False}), 401
+
+
 @app.route('/api/bookings', methods=['GET'])
 def get_bookings():
     rows = get_all_bookings()
@@ -234,22 +259,6 @@ def get_logs():
     logs = [l for l in logs if str(l.get("action", "")).lower() != "login_success"]
     return jsonify(logs)
 
-@app.route('/admin.html')
-def admin_page():
-    if 'user_id' not in session:
-        return redirect('/')  # Redireciona para a tela pública se não estiver logado
-    return send_from_directory('static', 'admin.html')  # Serve o painel admin
-
-@app.route('/auth/me', methods=['GET'])
-def auth_me():
-    if 'user_id' in session:
-        return jsonify({
-            "ok": True,
-            "id": session['user_id'],
-            "name": session.get('user_name'),
-            "role": session.get('role')
-        })
-    return jsonify({"ok": False}), 401
 
 
 # ✅ Rodar na rede para acesso via celular (Wi-Fi)

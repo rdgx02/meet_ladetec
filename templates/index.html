@@ -213,15 +213,13 @@
 
                 <!-- Botão de Admin (abre em nova aba) -->
 <div class="pt-2">
-  <a
-  id="adminButton"
-  href="/admin.html"
-  target="_blank"
-  rel="noopener"
-  class="block text-center bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-md transition duration-300"
+  <button
+  id="openAdminLoginBtn"
+  class="block text-center bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 w-full"
 >
   <i class="fas fa-user-shield mr-2"></i> Painel Admin
-</a>
+</button>
+
 
 </div>
 
@@ -1598,6 +1596,57 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 </div>
 
+
+<!-- Modal de Login Admin -->
+<div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
+    <h3 class="text-xl font-bold mb-4">Login Administrativo</h3>
+    <div class="mb-3">
+      <label class="block text-sm font-medium text-gray-700">Usuário</label>
+      <input type="text" id="adminUsername" class="w-full border px-3 py-2 rounded" />
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Senha</label>
+      <input type="password" id="adminPassword" class="w-full border px-3 py-2 rounded" />
+    </div>
+    <div class="flex gap-3">
+      <button id="loginAdminBtn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">Entrar</button>
+      <button id="closeAdminLoginBtn" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // abrir modal
+  document.getElementById('openAdminLoginBtn').addEventListener('click', () => {
+    document.getElementById('adminLoginModal').classList.remove('hidden');
+  });
+
+  // fechar modal
+  document.getElementById('closeAdminLoginBtn').addEventListener('click', () => {
+    document.getElementById('adminLoginModal').classList.add('hidden');
+  });
+
+  // login
+  document.getElementById('loginAdminBtn').addEventListener('click', async () => {
+    const username = document.getElementById('adminUsername').value.trim();
+    const password = document.getElementById('adminPassword').value.trim();
+
+    const res = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (res.ok) {
+      location.href = '/admin.html';
+    } else {
+      alert('Usuário ou senha inválidos');
+    }
+  });
+</script>
+
+
 <script>
 // ===== CLONE DA LÓGICA PÚBLICA PARA A TELA ADMIN =====
 // Reutiliza: calculateEndTime, getAllBookings, saveBooking, deleteBooking, isTimeSlotAvailable
@@ -1872,11 +1921,6 @@ if (adminScreen) {
     adminScreen.classList.add('hidden');
 }
 
-// Eventos do modal Admin
-document.getElementById('backToBookingAdmin')?.addEventListener('click', () => {
-  document.getElementById('confirmationModalAdmin').classList.add('hidden');
-  location.reload(); // limpa formulário
-});
 
 document.getElementById('goToConsultAdmin')?.addEventListener('click', () => {
   window.location.href = '#consulta'; // ou ajuste para a aba correta

@@ -262,17 +262,21 @@
 
   <script>
   // ===== Verifica sessão ao carregar =====
-  (async () => {
-    try {
-      const r = await fetch('/auth/me');
-      if (!r.ok) { location.href = '/'; return; }
-      const me = await r.json();
-      const el = document.getElementById('adminUserName');
-      if (el && me.name) el.textContent = me.name || '';
-    } catch(e) {
-      location.href = '/';
-    }
-  })();
+(async () => {
+  try {
+    const r = await fetch('/auth/me', { credentials: 'same-origin' });
+    if (!r.ok) { location.href = '/'; return; }
+
+    const me = await r.json();
+    if (!me.ok) { location.href = '/'; return; }
+
+    const el = document.getElementById('adminUserName');
+    if (el) el.textContent = me.name?.trim() || 'Admin';
+  } catch(e) {
+    location.href = '/';
+  }
+})();
+
 
   // ===== Helpers comuns =====
   function calculateEndTime(startTime, duration) {
@@ -396,10 +400,30 @@
     });
 
     // Modal Admin OKs
-    document.getElementById('backToBookingAdmin').addEventListener('click', ()=>{
-      document.getElementById('confirmationModalAdmin').classList.add('hidden');
-      location.reload();
-    });
+    document.getElementById('backToBookingAdmin').addEventListener('click', (e)=>{
+  e.preventDefault();
+  // Fecha o modal de confirmação
+  document.getElementById('confirmationModalAdmin').classList.add('hidden');
+
+  // Reabre a tela de "Novo Agendamento (Admin)"
+  const screen = document.getElementById('adminBookingScreen');
+  screen.classList.remove('hidden');
+
+  // Reseta o formulário e o estado visual
+  const form = document.getElementById('adminBookingForm');
+  form?.reset();
+
+  document.getElementById('admin-timeSlotsContainer').innerHTML = '';
+  document.querySelectorAll('#admin-roomOptions .room-option')
+    .forEach(o => o.classList.remove('selected','border-blue-500'));
+  document.querySelectorAll('#admin-durationOptions .duration-option').forEach(o => {
+    o.classList.remove('selected','border-blue-500','unavailable','opacity-50','cursor-not-allowed');
+    o.style.pointerEvents = 'auto';
+  });
+  document.getElementById('admin-repeat').value = 'none';
+  document.getElementById('admin-repeatTimesContainer').classList.add('hidden');
+});
+
     document.getElementById('goToConsultAdmin').addEventListener('click', ()=>{
       document.getElementById('confirmationModalAdmin').classList.add('hidden');
     });
@@ -698,6 +722,23 @@ overlayAdmin.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !overlayAdmin.classList.contains('hidden')) {
     overlayAdmin.classList.add('hidden');
+  }
+});
+
+// ===== Botão de Logout =====
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('adminLogoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await fetch('/admin/logout', {
+          method: 'POST',
+          credentials: 'same-origin'
+        });
+      } finally {
+        location.href = '/'; // volta para a tela pública
+      }
+    });
   }
 });
 
