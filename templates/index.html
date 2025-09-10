@@ -89,16 +89,23 @@
         </div>
 
         <!-- Duração -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Duração</label>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="60"><span class="font-medium">1 hora</span></div>
-            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="120"><span class="font-medium">2 horas</span></div>
-            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="180"><span class="font-medium">3 horas</span></div>
-            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="240"><span class="font-medium">4 horas</span></div>
-          </div>
-          <input type="hidden" id="duration" name="duration" required>
-        </div>
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-2">Duração</label>
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="60"><span class="font-medium">1 hora</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="120"><span class="font-medium">2 horas</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="180"><span class="font-medium">3 horas</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="240"><span class="font-medium">4 horas</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="300"><span class="font-medium">5 horas</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="360"><span class="font-medium">6 horas</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="420"><span class="font-medium">7 horas</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="480"><span class="font-medium">8 horas</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="540"><span class="font-medium">9 horas</span></div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="600"><span class="font-medium">10 horas</span></div>
+  </div>
+  <input type="hidden" id="duration" name="duration" required>
+</div>
+
 
         <!-- Repetir -->
         <div>
@@ -308,50 +315,65 @@
         });
       });
 
-      // gerar horários disponíveis
-      async function updateAvailableTimeSlots(){
-        const room=document.getElementById('room').value;
-        const date=document.getElementById('date').value;
-        const container=document.getElementById('timeSlotsContainer');
-        container.innerHTML='';
-        if(!room||!date) return;
+      // gerar horários disponíveis com intervalos de 15 minutos
+async function updateAvailableTimeSlots(){
+  const room = document.getElementById('room').value;
+  const date = document.getElementById('date').value;
+  const container = document.getElementById('timeSlotsContainer');
+  container.innerHTML = '';
+  if (!room || !date) return;
 
-        const today=new Date();
-        const [d,m,y]=date.split('/').map(Number);
-        const selected=new Date(y,m-1,d);
-        const isToday=today.toDateString()===selected.toDateString();
+  const today = new Date();
+  const [d, m, y] = date.split('/').map(Number);
+  const selected = new Date(y, m - 1, d);
+  const isToday = today.toDateString() === selected.toDateString();
 
-        for(let h=8;h<=21;h++){
-          const time=`${h}:00`;
-          if(isToday){
-            const now=today.getHours()*60+today.getMinutes();
-            const tm=h*60;
-            if(tm<=now) continue;
+  // Gera horários de 15 em 15 minutos, das 08:00 até 21:00
+  for (let minutes = 8 * 60; minutes <= 21 * 60; minutes += 30) {
+    const hh = Math.floor(minutes / 60);
+    const mm = minutes % 60;
+    const time = `${hh}:${String(mm).padStart(2, '0')}`;
+
+    if (isToday) {
+      const now = today.getHours() * 60 + today.getMinutes();
+      if (minutes <= now) continue;
+    }
+
+    const free = await isTimeSlotAvailable(room, date, time, 30);
+    const el = document.createElement('div');
+    el.className = `time-slot cursor-pointer p-2 border rounded-md text-center ${free ? 'border-gray-300' : 'border-gray-200 unavailable'}`;
+    el.textContent = time;
+    el.dataset.time = time;
+
+    if (free) {
+      el.addEventListener('click', async function () {
+        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected', 'border-blue-500'));
+        this.classList.add('selected', 'border-blue-500');
+        document.getElementById('startTime').value = this.dataset.time;
+
+        for (const op of document.querySelectorAll('.duration-option')) {
+          const dur = parseInt(op.dataset.duration);
+          const fits = await isTimeSlotAvailable(room, date, this.dataset.time, dur);
+          if (fits) {
+            op.classList.remove('unavailable', 'opacity-50', 'cursor-not-allowed');
+            op.classList.add('cursor-pointer');
+            op.style.pointerEvents = 'auto';
+          } else {
+            op.classList.remove('selected', 'cursor-pointer');
+            op.classList.add('unavailable', 'opacity-50', 'cursor-not-allowed');
+            op.style.pointerEvents = 'none';
           }
-          const free=await isTimeSlotAvailable(room,date,time,30);
-          const el=document.createElement('div');
-          el.className=`time-slot cursor-pointer p-2 border rounded-md text-center ${free?'border-gray-300':'border-gray-200 unavailable'}`;
-          el.textContent=time; el.dataset.time=time;
-
-          if(free){
-            el.addEventListener('click',async function(){
-              document.querySelectorAll('.time-slot').forEach(s=>s.classList.remove('selected','border-blue-500'));
-              this.classList.add('selected','border-blue-500');
-              document.getElementById('startTime').value=this.dataset.time;
-
-              for(const op of document.querySelectorAll('.duration-option')){
-                const dur=parseInt(op.dataset.duration);
-                const fits=await isTimeSlotAvailable(room,date,this.dataset.time,dur);
-                if(fits){ op.classList.remove('unavailable','opacity-50','cursor-not-allowed'); op.classList.add('cursor-pointer'); op.style.pointerEvents='auto'; }
-                else { op.classList.remove('selected','cursor-pointer'); op.classList.add('unavailable','opacity-50','cursor-not-allowed'); op.style.pointerEvents='none'; }
-              }
-              document.getElementById('duration').value='';
-              document.querySelectorAll('.duration-option').forEach(o=>o.classList.remove('selected','border-blue-500'));
-            });
-          }
-          container.appendChild(el);
         }
-      }
+
+        document.getElementById('duration').value = '';
+        document.querySelectorAll('.duration-option').forEach(o => o.classList.remove('selected', 'border-blue-500'));
+      });
+    }
+
+    container.appendChild(el);
+  }
+}
+
 
       // duração
       document.querySelectorAll('.duration-option').forEach(opt=>{

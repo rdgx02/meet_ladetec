@@ -222,16 +222,24 @@
           <input type="hidden" id="admin-startTime" required>
         </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Duração</label>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2" id="admin-durationOptions">
-            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="60"><span class="font-medium">1 hora</span></div>
-            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="120"><span class="font-medium">2 horas</span></div>
-            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="180"><span class="font-medium">3 horas</span></div>
-            <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="240"><span class="font-medium">4 horas</span></div>
-          </div>
-          <input type="hidden" id="admin-duration" required>
-        </div>
+        <!-- Duração -->
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-2">Duração</label>
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-2" id="admin-durationOptions">
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="60">1 hora</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="120">2 horas</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="180">3 horas</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="240">4 horas</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="300">5 horas</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="360">6 horas</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="420">7 horas</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="480">8 horas</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="540">9 horas</div>
+    <div class="duration-option cursor-pointer p-3 border border-gray-300 rounded-md text-center" data-duration="600">10 horas</div>
+  </div>
+  <input type="hidden" id="admin-duration" required>
+</div>
+
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Repetir reserva</label>
@@ -561,57 +569,62 @@
     document.getElementById('adminBookingForm').addEventListener('submit', handleAdminSubmit);
   }
 
-  async function updateAvailableTimeSlotsAdmin(){
-    const room = document.getElementById('admin-room').value;
-    const date = document.getElementById('admin-date').value;
-    const container = document.getElementById('admin-timeSlotsContainer');
-    container.innerHTML = '';
-    if (!room || !date) return;
+  async function updateAvailableTimeSlotsAdmin() {
+  const room = document.getElementById('admin-room').value;
+  const date = document.getElementById('admin-date').value;
+  const container = document.getElementById('admin-timeSlotsContainer');
+  container.innerHTML = '';
+  if (!room || !date) return;
 
-    const today = new Date();
-    const [d,m,y] = date.split('/').map(Number);
-    const selected = new Date(y, m-1, d);
-    const isToday = today.toDateString() === selected.toDateString();
+  const today = new Date();
+  const [d, m, y] = date.split('/').map(Number);
+  const selected = new Date(y, m - 1, d);
+  const isToday = today.toDateString() === selected.toDateString();
 
-    for (let hour=8; hour<=21; hour++){
-      const time = `${hour}:00`;
-      if (isToday){
-        const totalNow = today.getHours()*60 + today.getMinutes();
-        if (hour*60 <= totalNow) continue;
+  for (let h = 8; h <= 21; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+      if (isToday) {
+        const now = today.getHours() * 60 + today.getMinutes();
+        const current = h * 60 + m;
+        if (current <= now) continue;
       }
 
-      const available = await isTimeSlotAvailable(room, date, time, 30);
+      const available = await isTimeSlotAvailable(room, date, hourStr, 30);
       const div = document.createElement('div');
-      div.className = `time-slot cursor-pointer p-2 border rounded-md text-center ${available?'border-gray-300':'border-gray-200 unavailable'}`;
-      div.textContent = time;
-      div.dataset.time = time;
+      div.className = `time-slot cursor-pointer p-2 border rounded-md text-center ${available ? 'border-gray-300' : 'border-gray-200 unavailable'}`;
+      div.textContent = hourStr;
+      div.dataset.time = hourStr;
 
-      if (available){
-        div.addEventListener('click', async function(){
-          document.querySelectorAll('#admin-timeSlotsContainer .time-slot').forEach(s=>s.classList.remove('selected','border-blue-500'));
-          this.classList.add('selected','border-blue-500');
+      if (available) {
+        div.addEventListener('click', async function () {
+          document.querySelectorAll('#admin-timeSlotsContainer .time-slot').forEach(s => s.classList.remove('selected', 'border-blue-500'));
+          this.classList.add('selected', 'border-blue-500');
           document.getElementById('admin-startTime').value = this.dataset.time;
 
-          for (let option of document.querySelectorAll('#admin-durationOptions .duration-option')){
+          for (let option of document.querySelectorAll('#admin-durationOptions .duration-option')) {
             const duration = parseInt(option.dataset.duration);
             const fits = await isTimeSlotAvailable(room, date, this.dataset.time, duration);
-            if (fits){
-              option.classList.remove('unavailable','opacity-50','cursor-not-allowed');
+            if (fits) {
+              option.classList.remove('unavailable', 'opacity-50', 'cursor-not-allowed');
               option.classList.add('cursor-pointer');
-              option.style.pointerEvents='auto';
+              option.style.pointerEvents = 'auto';
             } else {
-              option.classList.remove('selected','cursor-pointer');
-              option.classList.add('unavailable','opacity-50','cursor-not-allowed');
-              option.style.pointerEvents='none';
+              option.classList.remove('selected', 'cursor-pointer');
+              option.classList.add('unavailable', 'opacity-50', 'cursor-not-allowed');
+              option.style.pointerEvents = 'none';
             }
           }
-          document.getElementById('admin-duration').value='';
-          document.querySelectorAll('#admin-durationOptions .duration-option').forEach(o=>o.classList.remove('selected','border-blue-500'));
+          document.getElementById('admin-duration').value = '';
+          document.querySelectorAll('#admin-durationOptions .duration-option').forEach(o => o.classList.remove('selected', 'border-blue-500'));
         });
       }
+
       container.appendChild(div);
     }
   }
+}
+
 
   async function handleAdminSubmit(e){
     e.preventDefault();
