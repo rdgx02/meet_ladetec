@@ -101,6 +101,23 @@
           </thead>
           <tbody id="adminResults" class="divide-y divide-gray-200"></tbody>
         </table>
+        </tbody>
+</table>
+
+<!-- Seletor de quantidade por página -->
+<div class="flex items-center gap-2 mb-4">
+  <label for="itemsPerPage" class="text-sm font-medium text-gray-700">Registros por página:</label>
+  <select id="itemsPerPage" class="border px-2 py-1 rounded text-sm">
+    <option value="10">10</option>
+    <option value="25" selected>25</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+  </select>
+</div>
+
+<!-- Paginação -->
+<!-- Nova Paginação Completa -->
+<div id="adminPagination" class="flex justify-center items-center flex-wrap gap-2 mt-4 text-sm"></div>
       </div>
     </div>
   </div>
@@ -441,49 +458,154 @@
     });
   });
 
-  async function applyAdminFilter(){
-    const filterDate = (document.getElementById('adminDate').value||'').trim();
-    const filterSearch = (document.getElementById('adminSearch').value||'').toLowerCase();
-    const filterSector = (document.getElementById('adminSector').value||'').trim();
+ let currentPage = 1;
+let itemsPerPage = 10;
 
-    const bookings = await getAllBookings();
-    const tbody = document.getElementById('adminResults');
-    tbody.innerHTML = '';
+async function applyAdminFilter(){
+  itemsPerPage = parseInt(document.getElementById('itemsPerPage').value);
+  const filterDate = (document.getElementById('adminDate').value||'').trim();
+  const filterSearch = (document.getElementById('adminSearch').value||'').toLowerCase();
+  const filterSector = (document.getElementById('adminSector').value||'').trim();
 
-    const filtered = bookings.filter(b=>{
-      const matchDate = !filterDate || b.date === filterDate;
-      const matchSector = !filterSector || b.sector === filterSector;
-      const matchSearch = !filterSearch || (
-        (b.name||'').toLowerCase().includes(filterSearch) ||
-        String(b.room||'').toLowerCase().includes(filterSearch) ||
-        String(b.start_time||'').toLowerCase().includes(filterSearch) ||
-        String(b.ticket||'').toLowerCase().includes(filterSearch)
-      );
-      return matchDate && matchSector && matchSearch;
-    });
+  const bookings = await getAllBookings();
 
-    filtered.forEach(b=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="px-4 py-2 text-center">
-          <input type="checkbox" class="rowCheckbox" data-id="${b.id}">
-        </td>
-        <td class="px-4 py-2">${b.id}</td>
-        <td class="px-4 py-2">${b.name}</td>
-        <td class="px-4 py-2">${b.sector}</td>
-        <td class="px-4 py-2">${b.room}</td>
-        <td class="px-4 py-2">${b.date}</td>
-        <td class="px-4 py-2">${b.start_time}</td>
-        <td class="px-4 py-2">${calculateEndTime(b.start_time, b.duration)}</td>
-        <td class="px-4 py-2">${b.ticket}</td>
-        <td class="px-4 py-2">
-          <button data-id="${b.id}" class="cancelBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm shadow">
-            <i class="fas fa-trash-alt"></i> Cancelar
-          </button>
-        </td>`;
-      tbody.appendChild(tr);
-    });
+  const filtered = bookings.filter(b=>{
+    const matchDate = !filterDate || b.date === filterDate;
+    const matchSector = !filterSector || b.sector === filterSector;
+    const matchSearch = !filterSearch || (
+      (b.name||'').toLowerCase().includes(filterSearch) ||
+      String(b.room||'').toLowerCase().includes(filterSearch) ||
+      String(b.start_time||'').toLowerCase().includes(filterSearch) ||
+      String(b.ticket||'').toLowerCase().includes(filterSearch)
+    );
+    return matchDate && matchSector && matchSearch;
+  });
+
+  // Ordena por ID (mais recentes primeiro). Se ID não for numérico, cai para data/hora.
+filtered.sort((a, b) => {
+  const ia = Number(a.id);
+  const ib = Number(b.id);
+  if (!Number.isNaN(ia) && !Number.isNaN(ib)) return ib - ia;
+
+  // fallback por data/hora
+  const [da, ma, ya] = String(a.date || '').split('/').map(Number);
+  const [db, mb, yb] = String(b.date || '').split('/').map(Number);
+  const [ha, mina] = String(a.start_time || '00:00').split(':').map(Number);
+  const [hb, minb] = String(b.start_time || '00:00').split(':').map(Number);
+  const dateA = new Date(ya, ma - 1, da, ha, mina);
+  const dateB = new Date(yb, mb - 1, db, hb, minb);
+  return dateB - dateA;
+});
+
+
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pageItems = filtered.slice(start, end);
+
+  const tbody = document.getElementById('adminResults');
+  tbody.innerHTML = '';
+
+  pageItems.forEach(b=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="px-4 py-2 text-center">
+        <input type="checkbox" class="rowCheckbox" data-id="${b.id}">
+      </td>
+      <td class="px-4 py-2">${b.id}</td>
+      <td class="px-4 py-2">${b.name}</td>
+      <td class="px-4 py-2">${b.sector}</td>
+      <td class="px-4 py-2">${b.room}</td>
+      <td class="px-4 py-2">${b.date}</td>
+      <td class="px-4 py-2">${b.start_time}</td>
+      <td class="px-4 py-2">${calculateEndTime(b.start_time, b.duration)}</td>
+      <td class="px-4 py-2">${b.ticket}</td>
+      <td class="px-4 py-2">
+        <button data-id="${b.id}" class="cancelBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm shadow">
+          <i class="fas fa-trash-alt"></i> Cancelar
+        </button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+    renderPagination(totalPages);
+}
+
+document.getElementById('itemsPerPage').addEventListener('change', function () {
+  currentPage = 1;
+  applyAdminFilter();
+});
+
+function renderPagination(totalPages) {
+  const pagination = document.getElementById('adminPagination');
+  pagination.innerHTML = '';
+
+  const createBtn = (label, page, disabled = false, isActive = false) => {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.className = `px-3 py-1 rounded ${
+      isActive
+        ? 'bg-blue-600 text-white'
+        : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+    }`;
+    if (disabled) {
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      btn.addEventListener('click', () => {
+        currentPage = page;
+        applyAdminFilter();
+      });
+    }
+    return btn;
+  };
+
+  // << Primeira
+  pagination.appendChild(createBtn('<<', 1, currentPage === 1));
+
+  // < Anterior
+  pagination.appendChild(createBtn('<', currentPage - 1, currentPage === 1));
+
+  // Páginas numéricas (ex: ... 3 4 5 ...)
+  const maxVisible = 5;
+  let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+  let end = Math.min(start + maxVisible - 1, totalPages);
+
+  if (end - start < maxVisible - 1) {
+    start = Math.max(1, end - maxVisible + 1);
   }
+
+  if (start > 1) {
+    pagination.appendChild(createBtn('1', 1));
+    if (start > 2) {
+      const dots = document.createElement('span');
+      dots.textContent = '...';
+      pagination.appendChild(dots);
+    }
+  }
+
+  for (let i = start; i <= end; i++) {
+    pagination.appendChild(createBtn(i, i, false, i === currentPage));
+  }
+
+  if (end < totalPages) {
+    if (end < totalPages - 1) {
+      const dots = document.createElement('span');
+      dots.textContent = '...';
+      pagination.appendChild(dots);
+    }
+    pagination.appendChild(createBtn(totalPages, totalPages));
+  }
+
+  // > Próxima
+  pagination.appendChild(createBtn('>', currentPage + 1, currentPage === totalPages));
+
+  // >> Última
+  pagination.appendChild(createBtn('>>', totalPages, currentPage === totalPages));
+}
+
+
 
   // ===== Logs =====
   async function loadLogs(){
